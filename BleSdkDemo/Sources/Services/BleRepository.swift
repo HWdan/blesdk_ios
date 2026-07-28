@@ -2,37 +2,87 @@ import Foundation
 import UIKit
 import WatchfaceSDK
 
-/// 封装 HwBluetoothSDK / SifliWatchfaceSDK，对齐 Android BleRepository 能力。
+/// Central facade over `HwBluetoothSDK` / `SifliWatchfaceSDK`, mirroring the Android
+/// `BleRepository` surface used by the demo app.
+///
+/// Responsibilities:
+/// - One-time SDK initialization and teardown
+/// - BLE scan / connect / disconnect, plus auto-reconnect aligned with HaWoFit `BleConnectManager`
+/// - Device bind / unbind and post-bind configuration (time, user info, language, etc.)
+/// - Health data sync (activity / heart rate / sleep)
+/// - Goals, alarms, reminders, social notification switches, contacts
+/// - File transfers: music, album photos, AGPS (primarily via Sifli push; JL paths remain available)
+///
+/// Threading: most SDK callbacks are hoppped onto the main queue before invoking completions
+/// or emitting `ConnectionEvent`s so UI callers can update safely.
+///
+/// Lifecycle notes:
+/// - Call `initSDK()` once at app launch (idempotent).
+/// - Enable `autoReconnectEnabled` after a successful bind; disable it on manual disconnect / unbind.
+/// - Only one music/album/AGPS transfer may run at a time (`isTransferring` / Sifli `isWorking`).
 final class BleRepository {
+    /// Shared singleton used by all feature screens.
     static let shared = BleRepository()
 
+    /// Persists the last successfully bound device (MAC, name, firmware metadata).
     private let store = BoundDeviceStore.shared
+
+    /// Whether `initSDK()` has already configured the underlying SDKs and callbacks.
     private var initialized = false
+
+    /// Observers notified of connection / reconnect lifecycle events.
+    /// Registered via `addConnectionHandler(_:)`; there is no remove API in this demo.
     private(set) var connectionHandlers: [(ConnectionEvent) -> Void] = []
 
-    /// 绑定成功后开启；手动断开 / 解绑时关闭。
+    /// When `true`, the repository will attempt to re-establish BLE after disconnects,
+    /// Bluetooth power-on, and app returning to foreground — matching Android bind behavior.
+    /// Turned on after bind succeeds; turned off on manual disconnect / unbind.
     private(set) var autoReconnectEnabled = false
-    /// 对齐 BleConnectManager：失败后 0.5s 再试；连接超时 13s。
+
+    /// Delay before scheduling another reconnect attempt after a failure
+    /// (aligned with `BleConnectManager`: 0.5s).
     private let reconnectRetryDelay: TimeInterval = 0.5
+
+    /// Per-attempt connect timeout in seconds used by auto-reconnect
+    /// (aligned with `BleConnectManager`: 13s).
     private let reconnectTimeout = 13
+
+    /// Pending delayed reconnect work item; cancelled when connected or auto-reconnect is disabled.
     private var reconnectWorkItem: DispatchWorkItem?
+
+    /// Monotonic counter of reconnect attempts since the last successful connection;
+    /// reset to 0 on connect success or when reconnect is cancelled.
     private var reconnectAttempt = 0
+
+    /// `true` while a reconnect `connect` call is in flight (prevents overlapping attempts
+    /// from being confused; scheduling still uses `reconnectWorkItem`).
     private var reconnectInFlight = false
 
+    /// `true` while a Sifli (or guarded) music / album / AGPS transfer is active.
     private(set) var isTransferring = false
+
+    /// Which transfer kind currently owns the transfer lock, if any.
     private var activeTransferKind: TransferKind?
 
+    /// High-level categories of exclusive file-transfer operations.
     enum TransferKind { case music, album, agps }
 
     private init() {}
 
+    /// Primary HaWoFit Bluetooth SDK entry point.
     var sdk: HwBluetoothSDK { HwBluetoothSDK.sharedInstance() }
+
+    /// Secondary center API used for activity counts, goals, and JL multi-file transfer.
     var center: HwBluetoothCenter { HwBluetoothCenter.sharedInstance() }
 
+    /// Registers a handler that receives `ConnectionEvent`s (connected, disconnected,
+    /// reconnecting, reconnectFailed). Handlers are retained for the process lifetime.
     func addConnectionHandler(_ handler: @escaping (ConnectionEvent) -> Void) {
         connectionHandlers.append(handler)
     }
 
+    /// Enables or disables automatic reconnection.
+    /// When disabling, any scheduled or in-flight reconnect bookkeeping is cancelled.
     func setAutoReconnectEnabled(_ enabled: Bool) {
         autoReconnectEnabled = enabled
         if !enabled {
@@ -40,20 +90,24 @@ final class BleRepository {
         }
     }
 
+    /// Initializes `HwBluetoothSDK` and `SifliWatchfaceSDK` once, then installs:
+    /// - connection-state callback (debounced 0.3s, matching `BleConnectManager`)
+    /// - Bluetooth power-state callback (reconnect when BT becomes available)
+    /// - `UIApplication.didBecomeActive` observer (reconnect when returning to foreground)
     func initSDK() {
         guard !initialized else { return }
         sdk.initSDK()
         SifliWatchfaceSDK.getInstance().initSDK()
         initialized = true
 
-        // 对齐 BleConnectManager：连接态变化延后 0.3s 再处理
+        // Debounce connection-state handling by 0.3s (BleConnectManager parity).
         sdk.addBluetoothConnectionStateChangedCallback { [weak self] state in
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 self?.handleConnectionStateChanged(state)
             }
         }
 
-        // 蓝牙重新可用且已绑定 → 立即重连
+        // When Bluetooth becomes available again and a device is bound, reconnect immediately.
         sdk.addBluetoothStateChangedCallback { [weak self] state in
             DispatchQueue.main.async {
                 guard let self = self else { return }
@@ -74,9 +128,11 @@ final class BleRepository {
         }
     }
 
+    /// Tears down the Bluetooth SDK if it was initialized.
+    /// Uses `destroySDK` when available, otherwise falls back to `destroy` (Swift/ObjC naming variance).
     func destroy() {
         if initialized {
-            // ObjC destroySDK；部分 Swift 映射为 destroy()
+            // ObjC destroySDK; some Swift overlays map this as destroy().
             if sdk.responds(to: NSSelectorFromString("destroySDK")) {
                 sdk.perform(NSSelectorFromString("destroySDK"))
             } else {
@@ -86,14 +142,29 @@ final class BleRepository {
         }
     }
 
+    /// SDK library version string from `HwBluetoothSDK`.
     func version() -> String { sdk.version() }
+
+    /// Whether the SDK currently reports an active BLE connection.
     func isConnected() -> Bool { sdk.connected() }
+
+    /// Name of the currently connected peripheral, if any.
     func connectedName() -> String? { sdk.connectedDevice()?.name }
+
+    /// MAC address of the currently connected peripheral, if any.
     func connectedMac() -> String? { sdk.connectedDevice()?.macAddress }
+
+    /// CoreBluetooth peripheral UUID string of the connected device (required by Sifli APIs).
     func connectedUUID() -> String? { sdk.connectedDevice()?.peripheral?.identifier.uuidString }
 
+    /// Loads the persisted bound-device record from local storage (may be nil if never bound).
     func loadBoundDevice() -> BoundDeviceRecord? { store.load() }
 
+    /// Persists bind result metadata after a successful bind / device-info fetch.
+    /// - Parameters:
+    ///   - mac: Device MAC address (primary reconnect key).
+    ///   - name: Optional display name.
+    ///   - info: Optional rich device info used to fill firmware / battery / protocol fields.
     func saveBoundDevice(mac: String, name: String?, info: BleDeviceInfoModel?) {
         store.save(BoundDeviceRecord(
             macAddress: mac,
@@ -106,10 +177,19 @@ final class BleRepository {
         ))
     }
 
+    /// Clears the locally persisted bound-device record (typically after unbind).
     func clearBoundDevice() { store.clear() }
 
     // MARK: - Scan / Connect
 
+    /// Scans for nearby BLE devices for `timeout` seconds.
+    ///
+    /// Results are deduplicated by MAC (or UUID fallback) and sorted by RSSI descending
+    /// on each update. `onFinish` is invoked when the scan window ends.
+    /// - Parameters:
+    ///   - timeout: Scan duration in seconds (default 10).
+    ///   - onUpdate: Called on the main queue whenever the device map changes.
+    ///   - onFinish: Called on the main queue when scanning stops.
     func scan(timeout: TimeInterval = 10,
               onUpdate: @escaping ([BleDeviceItem]) -> Void,
               onFinish: @escaping () -> Void) {
@@ -133,8 +213,15 @@ final class BleRepository {
         })
     }
 
+    /// Stops an in-progress scan started by `scan(...)`.
     func stopScan() { sdk.stopScan() }
 
+    /// Connects using a discovered `HwBluetoothDevice` instance.
+    /// On success, emits `.connected` and returns a `BleDeviceItem` snapshot.
+    /// - Parameters:
+    ///   - device: Device from a prior scan callback.
+    ///   - timeout: Connect timeout in seconds (default 30).
+    ///   - completion: Main-queue result.
     func connect(device: HwBluetoothDevice, timeout: TimeInterval = 30,
                  completion: @escaping (Result<BleDeviceItem, Error>) -> Void) {
         sdk.connect(with: device, timeout: Int(timeout)) { [weak self] error in
@@ -155,6 +242,8 @@ final class BleRepository {
         }
     }
 
+    /// Connects by MAC address (used for reconnect / known devices without a scan result).
+    /// On success, emits `.connected` with the live peripheral name when available.
     func connect(mac: String, timeout: TimeInterval = 30,
                  completion: @escaping (Result<Void, Error>) -> Void) {
         sdk.connect(withMac: mac, timeout: Int(timeout)) { [weak self] error in
@@ -170,8 +259,11 @@ final class BleRepository {
         }
     }
 
+    /// Disconnects the current peripheral.
+    /// Cancels queued reconnect retries; callers that want a permanent disconnect should
+    /// also call `setAutoReconnectEnabled(false)` beforehand so auto-reconnect does not restart.
     func disconnect(completion: ((Error?) -> Void)? = nil) {
-        // 手动断开前由调用方关闭 autoReconnect；此处仅取消排队中的重试
+        // Caller should disable autoReconnect for a manual disconnect; here we only cancel queued retries.
         cancelReconnect()
         sdk.disconnect { error in
             DispatchQueue.main.async {
@@ -181,9 +273,19 @@ final class BleRepository {
         }
     }
 
-    // MARK: - Reconnect (对齐 HaWoFit BleConnectManager)
+    // MARK: - Reconnect (aligned with HaWoFit BleConnectManager)
 
-    /// 冷启动 / 回前台 / 蓝牙可用时调用
+    /// Entry point for automatic reconnection (cold start, foreground, BT power-on, disconnect).
+    ///
+    /// Preconditions (all required):
+    /// - `autoReconnectEnabled == true`
+    /// - a bound device exists in `BoundDeviceStore`
+    /// - not already connected
+    /// - Bluetooth radio is powered on
+    /// - app is not in background (background reconnect loop is intentionally disabled)
+    ///
+    /// Prefer `getLastConnectedDevice()` when available; otherwise fall back to stored MAC.
+    /// - Parameter reasonKey: Localization key describing why reconnect started (for UI / logs).
     func startConnectBluetooth(reasonKey: String = "reason_auto") {
         guard autoReconnectEnabled else { return }
         guard store.load() != nil else { return }
@@ -192,7 +294,7 @@ final class BleRepository {
             return
         }
         guard sdk.powerOn() else { return }
-        // 后台不发起重连（与 BleConnectManager 一致；后台循环已注释掉）
+        // Do not start reconnect in background (same as BleConnectManager; background loop is commented out).
         if UIApplication.shared.applicationState == .background { return }
 
         cancelScheduledReconnect()
@@ -223,6 +325,10 @@ final class BleRepository {
         }
     }
 
+    /// Handles SDK connection-state transitions after the 0.3s debounce.
+    /// - `.connected`: clears reconnect state and emits success.
+    /// - `.disconnected`: emits disconnect; if auto-reconnect is allowed (foreground + BT on),
+    ///   immediately calls `startConnectBluetooth` (BleConnectManager parity).
     private func handleConnectionStateChanged(_ state: HwBluetoothConnectionState) {
         if state == .connected {
             cancelReconnect()
@@ -234,14 +340,17 @@ final class BleRepository {
         }
         guard state == .disconnected else { return }
         emit(.disconnected)
-        // 对齐 BleConnectManager.bluetoothConnectionStateChanged：
-        // 前台 + 蓝牙开 + 已绑定 → 立即 startConnectBluetooth
+        // BleConnectManager.bluetoothConnectionStateChanged:
+        // foreground + BT on + bound → startConnectBluetooth immediately.
         guard autoReconnectEnabled else { return }
         guard sdk.powerOn() else { return }
         if UIApplication.shared.applicationState == .background { return }
         startConnectBluetooth(reasonKey: "reason_auto")
     }
 
+    /// Processes the result of a reconnect `connect` call.
+    /// On failure, emits `.reconnectFailed` and schedules another attempt after `reconnectRetryDelay`
+    /// (unless background / auto-reconnect off / already connected). On success, resets attempt count.
     private func handleReconnectCallback(error: Error?, reasonKey: String, attempt: Int) {
         reconnectInFlight = false
         if let error = error {
@@ -256,6 +365,7 @@ final class BleRepository {
         emit(.connected(name: d?.name, mac: d?.macAddress ?? store.load()?.macAddress))
     }
 
+    /// Schedules `startConnectBluetooth` after `reconnectRetryDelay`, replacing any prior work item.
     private func scheduleReconnectRetry(reasonKey: String) {
         cancelScheduledReconnect()
         let work = DispatchWorkItem { [weak self] in
@@ -265,17 +375,20 @@ final class BleRepository {
         DispatchQueue.main.asyncAfter(deadline: .now() + reconnectRetryDelay, execute: work)
     }
 
+    /// Cancels only the delayed retry work item (does not reset attempt counters).
     private func cancelScheduledReconnect() {
         reconnectWorkItem?.cancel()
         reconnectWorkItem = nil
     }
 
+    /// Fully stops reconnect: cancels scheduled work and resets in-flight / attempt state.
     private func cancelReconnect() {
         cancelScheduledReconnect()
         reconnectInFlight = false
         reconnectAttempt = 0
     }
 
+    /// Triggered when the app becomes active; starts reconnect if bound and not connected.
     private func applicationDidBecomeActive() {
         guard autoReconnectEnabled else { return }
         guard store.load() != nil else { return }
@@ -285,30 +398,36 @@ final class BleRepository {
 
     // MARK: - Bind
 
+    /// Begins the device bind handshake (user confirmation / pairing flow on the watch).
     func startBind(completion: @escaping (Result<Void, Error>) -> Void) {
         sdk.startBindDevice { ok, error in
             DispatchQueue.main.async { Self.boolResult(ok, error, completion) }
         }
     }
 
+    /// Completes the bind session after `startBind` succeeds and follow-up config is done.
     func endBind(completion: @escaping (Result<Void, Error>) -> Void) {
         sdk.endBindDevice { ok, error in
             DispatchQueue.main.async { Self.boolResult(ok, error, completion) }
         }
     }
 
+    /// Unbinds the device on the firmware side. Callers should also clear local store
+    /// and disable auto-reconnect as part of the unbind UI flow.
     func unbindDevice(completion: @escaping (Result<Void, Error>) -> Void) {
         sdk.unbindDevice { ok, error in
             DispatchQueue.main.async { Self.boolResult(ok, error, completion) }
         }
     }
 
+    /// Syncs phone wall-clock time to the device (24-hour format).
     func setDeviceTime(completion: @escaping (Result<Void, Error>) -> Void) {
         sdk.setDeviceTime(Date(), is24H: true) { ok, error in
             DispatchQueue.main.async { Self.boolResult(ok, error, completion) }
         }
     }
 
+    /// Pushes demo user profile (male, age 28, 175 cm, 70 kg) used by the bind demo flow.
     func setUserInfo(completion: @escaping (Result<Void, Error>) -> Void) {
         let user = HwUserInfo()
         user.gender = .male
@@ -320,12 +439,14 @@ final class BleRepository {
         }
     }
 
+    /// Sets distance / unit system to metric.
     func setUnitMetric(completion: @escaping (Result<Void, Error>) -> Void) {
         sdk.setUnit(.metric) { ok, error in
             DispatchQueue.main.async { Self.boolResult(ok, error, completion) }
         }
     }
 
+    /// Sets device UI language. Default raw value `0x01` matches the demo's English setting.
     func setLanguage(_ language: HwLanguage = HwLanguage(rawValue: 0x01)!,
                      completion: @escaping (Result<Void, Error>) -> Void) {
         sdk.setLanguage(language) { ok, error in
@@ -333,6 +454,11 @@ final class BleRepository {
         }
     }
 
+    /// Fetches device info (id, type, firmware, MAC, battery, protocol, watchface id).
+    /// Also calls `updateMacAddressIfNeed` when a MAC is present so later reconnects stay accurate.
+    ///
+    /// Note: Swift imports ObjC property `Id` as `id`. Do not use KVC key `"id"`
+    /// (throws `NSUnknownKeyException`).
     func getDeviceInfo(completion: @escaping (Result<BleDeviceInfoModel, Error>) -> Void) {
         sdk.getDeviceInfo { info, error in
             DispatchQueue.main.async {
@@ -342,7 +468,7 @@ final class BleRepository {
                     return
                 }
                 var model = BleDeviceInfoModel()
-                // Swift 将 ObjC `Id` 导入为 `id`；勿用 KVC "id"（会抛 NSUnknownKeyException）
+                // Swift maps ObjC `Id` to `id`; avoid KVC "id" (NSUnknownKeyException).
                 model.id = info.id
                 model.type = info.type
                 model.firmwareVersion = info.firmwareVersion
@@ -358,6 +484,7 @@ final class BleRepository {
         }
     }
 
+    /// Queries whether the phone/watch classic or BLE pairing state is established.
     func getPairState(completion: @escaping (Result<Bool, Error>) -> Void) {
         sdk.getPairState { ok, error in
             DispatchQueue.main.async {
@@ -367,16 +494,19 @@ final class BleRepository {
         }
     }
 
+    /// Asks the device to enter pairing mode / prompt the user to pair.
     func requestDeviceToPair(completion: @escaping (Result<Void, Error>) -> Void) {
         sdk.requestDeviceToPair { ok, error in
             DispatchQueue.main.async { Self.boolResult(ok, error, completion) }
         }
     }
 
+    /// Clears SDK-side connection cache (e.g. before a clean re-pair).
     func removeConnectionCache() { sdk.removeConnectionCache() }
 
     // MARK: - Health
 
+    /// Reads how many activity / sleep / heart-rate / HRF records are buffered on the device.
     func getHealthDataCount(completion: @escaping (Result<HealthDataCount, Error>) -> Void) {
         center.getActivityNum { sportNum, sleepNum, heartrateNum, hrfNum, error in
             DispatchQueue.main.async {
@@ -391,6 +521,7 @@ final class BleRepository {
         }
     }
 
+    /// Pulls up to `count` activity records from the device.
     func getActivities(count: UInt, completion: @escaping (Result<[HwActivity], Error>) -> Void) {
         guard count > 0 else { completion(.success([])); return }
         sdk.getActivities(count) { list, error in
@@ -401,6 +532,8 @@ final class BleRepository {
         }
     }
 
+    /// Pulls heart-rate records (default up to 50). Returned as `[Any]` because the SDK
+    /// type varies across firmware / SDK versions in this demo.
     func getHeartrates(count: UInt = 50, completion: @escaping (Result<[Any], Error>) -> Void) {
         sdk.getHeartrates(count) { list, error in
             DispatchQueue.main.async {
@@ -410,6 +543,7 @@ final class BleRepository {
         }
     }
 
+    /// Pulls sleep records (default up to 50). Same untyped list caveat as heart rates.
     func getSleeps(count: UInt = 50, completion: @escaping (Result<[Any], Error>) -> Void) {
         sdk.getSleeps(count) { list, error in
             DispatchQueue.main.async {
@@ -419,25 +553,35 @@ final class BleRepository {
         }
     }
 
+    /// Deletes all activity records stored on the device after a successful sync pull.
     func deleteActivities(completion: @escaping (Result<Void, Error>) -> Void) {
         sdk.deleteActivities { ok, error in
             DispatchQueue.main.async { Self.boolResult(ok, error, completion) }
         }
     }
 
+    /// Deletes all heart-rate records stored on the device after a successful sync pull.
     func deleteHeartrates(completion: @escaping (Result<Void, Error>) -> Void) {
         sdk.deleteHeartrates { ok, error in
             DispatchQueue.main.async { Self.boolResult(ok, error, completion) }
         }
     }
 
+    /// Deletes all sleep records stored on the device after a successful sync pull.
     func deleteSleeps(completion: @escaping (Result<Void, Error>) -> Void) {
         sdk.deleteSleeps { ok, error in
             DispatchQueue.main.async { Self.boolResult(ok, error, completion) }
         }
     }
 
-    /// 对齐 Android sync：必要时可先重连；计数 → 按数量拉取 → 非空再删表端。
+    /// Full health sync pipeline aligned with Android `sync`:
+    /// 1. Query on-device counts
+    /// 2. Fetch activities / heart rates / sleeps by those counts
+    /// 3. Delete each non-empty category from the device
+    /// 4. Return a localized summary string (counts + step sum)
+    ///
+    /// Fetch failures for individual categories are treated as empty lists so sync can continue;
+    /// only the initial count query failure aborts the whole operation.
     func syncHealthData(completion: @escaping (Result<String, Error>) -> Void) {
         getHealthDataCount { [weak self] countResult in
             guard let self = self else { return }
@@ -482,6 +626,7 @@ final class BleRepository {
         }
     }
 
+    /// Helper that no-ops when `count == 0` instead of calling the SDK with a zero request.
     private func fetchActivities(count: Int, completion: @escaping (Result<[HwActivity], Error>) -> Void) {
         guard count > 0 else { completion(.success([])); return }
         getActivities(count: UInt(count), completion: completion)
@@ -499,6 +644,7 @@ final class BleRepository {
 
     // MARK: - Goals
 
+    /// Reads the current goal configuration from the device.
     func getGoals(completion: @escaping (Result<HwGoal, Error>) -> Void) {
         center.getGoalInfoModel { goal, error in
             DispatchQueue.main.async {
@@ -509,12 +655,15 @@ final class BleRepository {
         }
     }
 
+    /// Sets a single goal value for the given `HwGoalType`.
     func setGoal(type: HwGoalType, value: Int, completion: @escaping (Result<Void, Error>) -> Void) {
         sdk.setGoalWith(type, goal: value) { ok, error in
             DispatchQueue.main.async { Self.boolResult(ok, error, completion) }
         }
     }
 
+    /// Sequentially writes a fixed demo goal set (steps, calories, distance, sleep, duration).
+    /// Stops and fails on the first individual `setGoal` error.
     func setDemoGoals(completion: @escaping (Result<Void, Error>) -> Void) {
         let steps: [(HwGoalType, Int)] = [
             (.step, 80), (.caloris, 400), (.distance, 5), (.sleep, 8), (.duration, 30)
@@ -534,6 +683,7 @@ final class BleRepository {
 
     // MARK: - Alarms / reminders
 
+    /// Fetches all alarms currently stored on the device.
     func getAlarms(completion: @escaping (Result<[HwAlarm], Error>) -> Void) {
         sdk.getAlarmsWithCallback { list, error in
             DispatchQueue.main.async {
@@ -543,12 +693,14 @@ final class BleRepository {
         }
     }
 
+    /// Adds one demo weekday alarm at 07:30 with localized custom text
+    /// (aligned with Android `createDemoAlarm`).
     func addDemoAlarm(completion: @escaping (Result<Void, Error>) -> Void) {
         let alarm = HwAlarm()
         alarm.setValue(true, forKey: "S")
         alarm.custom = L10n.tr("alarms_demo_content")
         alarm.times = [HwTimePoint(hour: 7, minute: 30)]
-        // 工作日：周一～周五（对齐 Android createDemoAlarm）
+        // Weekdays Mon–Fri (Android createDemoAlarm parity).
         let weekdays = Int(HwWeek.monday.rawValue) | Int(HwWeek.tuesday.rawValue) | Int(HwWeek.wednesday.rawValue)
             | Int(HwWeek.thursday.rawValue) | Int(HwWeek.friday.rawValue)
         alarm.setValue(weekdays, forKey: "week")
@@ -557,8 +709,10 @@ final class BleRepository {
         }
     }
 
+    /// Deletes every alarm. Prefers the batch `deleteAlarms` API when present;
+    /// otherwise loads the list and deletes each alarm by ID concurrently via `DispatchGroup`.
     func deleteAllAlarms(completion: @escaping (Result<Void, Error>) -> Void) {
-        // Prefer batch API if present
+        // Prefer batch API if present.
         let sel = NSSelectorFromString("deleteAlarmsWithCallback:")
         if sdk.responds(to: sel) {
             sdk.deleteAlarms { ok, error in
@@ -590,6 +744,7 @@ final class BleRepository {
         }
     }
 
+    /// Reads the sedentary-reminder configuration from the device.
     func getSedentary(completion: @escaping (Result<HwSedentaryReminder, Error>) -> Void) {
         sdk.getSedentaryReminder { reminder, error in
             DispatchQueue.main.async {
@@ -600,6 +755,7 @@ final class BleRepository {
         }
     }
 
+    /// Writes a demo sedentary reminder: weekdays 09:00–18:00, interval 1 hour.
     func setDemoSedentary(completion: @escaping (Result<Void, Error>) -> Void) {
         let r = HwSedentaryReminder()
         r.on = true
@@ -612,6 +768,7 @@ final class BleRepository {
         }
     }
 
+    /// Writes a demo drink-water reminder: every day 08:00–20:00, interval 1 hour, duration 5.
     func setDemoDrinkWater(completion: @escaping (Result<Void, Error>) -> Void) {
         let c = HwDrinkWaterConfig()
         c.eventOn = true
@@ -627,6 +784,7 @@ final class BleRepository {
         }
     }
 
+    /// Writes a demo hand-washing reminder: every day 08:00–22:00, interval 2 hours, duration 5.
     func setDemoWashHand(completion: @escaping (Result<Void, Error>) -> Void) {
         let c = HwHandwashingConfig()
         c.eventOn = true
@@ -642,21 +800,21 @@ final class BleRepository {
         }
     }
 
-    /// 周一～周五
+    /// Bitmask for Monday–Friday (`HwWeek` flags ORed together).
     private static var weekdaysMask: Int {
         Int(HwWeek.monday.rawValue) | Int(HwWeek.tuesday.rawValue) | Int(HwWeek.wednesday.rawValue)
             | Int(HwWeek.thursday.rawValue) | Int(HwWeek.friday.rawValue)
     }
 
-    /// 每天
+    /// Bitmask for all seven days of the week.
     private static var everyDayMask: Int {
         weekdaysMask | Int(HwWeek.saturday.rawValue) | Int(HwWeek.sunday.rawValue)
     }
 
     // MARK: - Notify / contacts
 
-    /// 通知开关列表（对齐 Android `getSocialAppSwitches`）。
-    /// 注意：不是 `getSocialApps`（那是社交 App 图标包）。
+    /// Notification switch list (aligned with Android `getSocialAppSwitches`).
+    /// Do not confuse with `getSocialApps`, which returns social-app icon packages.
     func getSocialSwitches(completion: @escaping (Result<[HwSocialSwitch], Error>) -> Void) {
         sdk.getSocialSwitches { list, error in
             DispatchQueue.main.async {
@@ -666,7 +824,8 @@ final class BleRepository {
         }
     }
 
-    /// Demo：开启微信 / 短信 / 来电（对齐 Android Wechat + SMS + IncomingCall）。
+    /// Demo helper: enables WeChat / SMS / incoming-call notification switches sequentially
+    /// (Android Wechat + SMS + IncomingCall parity).
     func enableDemoSocialSwitches(completion: @escaping (Result<Void, Error>) -> Void) {
         let types: [HwSocialSwitchType] = [.wechat, .message, .calls]
         func run(_ i: Int) {
@@ -689,6 +848,7 @@ final class BleRepository {
         run(0)
     }
 
+    /// Writes two hardcoded demo contacts onto the device.
     func setDemoContacts(completion: @escaping (Result<Void, Error>) -> Void) {
         let c1 = HwContact()
         c1.contactName = "Demo A"
@@ -701,6 +861,7 @@ final class BleRepository {
         }
     }
 
+    /// Sets the SOS / emergency contact name and phone number used by the watch.
     func setEmergencyContact(completion: @escaping (Result<Void, Error>) -> Void) {
         sdk.setSosName("Emergency", phoneNumber: "120") { ok, error in
             DispatchQueue.main.async { Self.boolResult(ok, error, completion) }
@@ -709,6 +870,7 @@ final class BleRepository {
 
     // MARK: - Music / Album / AGPS
 
+    /// Queries available and total music storage on the device (values in KB).
     func getMusicStorage(completion: @escaping (Result<MusicStorage, Error>) -> Void) {
         sdk.getMusicAvailableStorage { available, total, error in
             DispatchQueue.main.async {
@@ -718,6 +880,7 @@ final class BleRepository {
         }
     }
 
+    /// Returns the list of album slot / file IDs currently occupied on the device.
     func getAlbumFileIds(completion: @escaping (Result<[Int], Error>) -> Void) {
         sdk.getAlbumFilesIdList { ids, error in
             DispatchQueue.main.async {
@@ -732,7 +895,8 @@ final class BleRepository {
         }
     }
 
-    /// 分配 1...50 空闲槽位（对齐 Android allocateAlbumIndices）。
+    /// Allocates `count` free album slot indices in the range 1...50
+    /// (aligned with Android `allocateAlbumIndices`). Fails if not enough free slots remain.
     func allocateAlbumIndices(count: Int, completion: @escaping (Result<[Int], Error>) -> Void) {
         getAlbumFileIds { result in
             switch result {
@@ -753,6 +917,7 @@ final class BleRepository {
         }
     }
 
+    /// Queries whether classic Bluetooth (BT) is connected — relevant for JL transfer paths.
     func getBtConnectionState(completion: @escaping (Result<Bool, Error>) -> Void) {
         sdk.getBtConnectionState { ok, error in
             DispatchQueue.main.async {
@@ -762,6 +927,8 @@ final class BleRepository {
         }
     }
 
+    /// Reads GPS / AGPS status from the device, normalizing epoch times to milliseconds
+    /// (SDK returns seconds; HaWoFit UI multiplies by 1000 when displaying).
     func getDeviceGpsStatus(completion: @escaping (Result<BleGpsStatusModel, Error>) -> Void) {
         sdk.getDeviceGpsStatus { status, error in
             DispatchQueue.main.async {
@@ -771,7 +938,7 @@ final class BleRepository {
                     return
                 }
                 var m = BleGpsStatusModel()
-                // SDK 返回秒级时间戳（HaWoFit 展示时 *1000）
+                // SDK returns second-level timestamps (HaWoFit displays after *1000).
                 m.agpsValidStartTimeMs = Self.normalizeEpochMs(Int64(status.agpsValidStartTime))
                 m.agpsValidEndTimeMs = Self.normalizeEpochMs(Int64(status.agpsValidEndTime))
                 m.gpsClipType = status.gpsClipType
@@ -782,12 +949,15 @@ final class BleRepository {
         }
     }
 
+    /// Aborts any active Sifli transfer and clears the local transfer lock.
     func cancelTransfer() {
         SifliWatchfaceSDK.getInstance().stop()
         isTransferring = false
         activeTransferKind = nil
     }
 
+    /// Acquires the exclusive transfer lock for `kind`.
+    /// Returns an error if another transfer (or Sifli `isWorking`) is already active.
     private func beginTransfer(_ kind: TransferKind) -> Error? {
         if isTransferring || SifliWatchfaceSDK.getInstance().isWorking {
             return SdkError(code: -1, message: L10n.tr("err_transfer_busy"))
@@ -797,12 +967,19 @@ final class BleRepository {
         return nil
     }
 
+    /// Releases the exclusive transfer lock.
     private func endTransfer() {
         isTransferring = false
         activeTransferKind = nil
     }
 
-    /// iOS 统一走思澈推送，不依赖经典 BT。
+    /// Preferred music push entry for iOS: always uses Sifli push and does not require classic BT.
+    /// Acquires the transfer lock, stages files under a temp `music/mp3` tree, then pushes.
+    /// - Parameters:
+    ///   - fileURLs: Source MP3 file URLs selected by the user.
+    ///   - onReady: Invoked when packaging/compression succeeds and transfer is about to start.
+    ///   - onProgress: Transfer progress in 0...1.
+    ///   - completion: Final success / failure after cleanup.
     func pushMusicAuto(fileURLs: [URL],
                        onReady: @escaping () -> Void,
                        onProgress: @escaping (Float) -> Void,
@@ -811,13 +988,18 @@ final class BleRepository {
         pushMusicSifliInternal(fileURLs: fileURLs, onReady: onReady, onProgress: onProgress, completion: completion)
     }
 
+    /// Stages selected MP3s into `…/selectTemp/music/mp3/` then calls `pushMusicSifli`.
+    ///
+    /// Path layout matches HaWoFit `HwMusicService`: `SifliWatchfaceSDK.packageQjsMp3`
+    /// strips the last path component and zips the `music` directory. The zip must contain
+    /// `music/mp3/*.mp3` or the watch returns error code 22 when starting a single-file session.
     private func pushMusicSifliInternal(fileURLs: [URL],
                                         onReady: @escaping () -> Void,
                                         onProgress: @escaping (Float) -> Void,
                                         completion: @escaping (Result<Void, Error>) -> Void) {
-        // 对齐 HaWoFit HwMusicService：目录必须是 …/music/mp3
-        // SifliWatchfaceSDK.packageQjsMp3 会对路径 deletingLastPathComponent 后压缩 `music` 目录，
-        // zip 内需为 music/mp3/*.mp3，否则表端单文件开始会返回错误码 22。
+        // HaWoFit HwMusicService: directory must be …/music/mp3.
+        // SifliWatchfaceSDK.packageQjsMp3 deletes the last path component then zips `music`;
+        // zip contents must be music/mp3/*.mp3 or the watch returns error 22.
         let fm = FileManager.default
         let root = fm.temporaryDirectory
             .appendingPathComponent("qjs_musics_\(UUID().uuidString)", isDirectory: true)
@@ -859,7 +1041,8 @@ final class BleRepository {
         })
     }
 
-    /// 对齐 HwMusicViewController：去掉空格与特殊字符，避免表端无法识别文件名。
+    /// Sanitizes music file names for the watch: strips spaces and special characters
+    /// (aligned with `HwMusicViewController`) so the firmware can resolve the file.
     private static func sanitizeMusicFileName(_ raw: String) -> String {
         let noSpace = raw.replacingOccurrences(of: " ", with: "")
         let banned = CharacterSet(charactersIn: "@／：；（）¥「」＂、[]{}#%-*+=_\\|~＜＞$€^•'@#$%^&*()_+'\"")
@@ -869,6 +1052,8 @@ final class BleRepository {
         return base + ".mp3"
     }
 
+    /// JL (JieLi) multi-file music transfer over classic BT via `HwBluetoothCenter`.
+    /// Kept for parity / debugging; iOS demo default path is `pushMusicAuto` (Sifli).
     func pushMusicJL(fileURLs: [URL],
                      onReady: @escaping () -> Void,
                      onProgress: @escaping (Float) -> Void,
@@ -906,6 +1091,8 @@ final class BleRepository {
         )
     }
 
+    /// Low-level Sifli music push: `directoryURL` must point at the `mp3` folder whose parent
+    /// tree packs to `music/mp3/*.mp3`. Requires a connected CoreBluetooth UUID.
     func pushMusicSifli(directoryURL: URL,
                         onCompress: @escaping (Bool) -> Void,
                         onProgress: @escaping (Int) -> Void,
@@ -929,9 +1116,18 @@ final class BleRepository {
         )
     }
 
-    /// 默认相册推送分辨率（对齐 Demo / 常见思澈表；APP 用产品宽高）。
+    /// Default album push resolution (demo / common Sifli watches). Production apps should
+    /// use the product's actual display width/height.
     static let defaultAlbumSize = CGSize(width: 466, height: 466)
 
+    /// Preferred album push entry: acquires transfer lock, resizes/crops images, allocates
+    /// free album slots (1...50), then pushes via Sifli.
+    /// - Parameters:
+    ///   - images: Source photos from the picker.
+    ///   - size: Target watchface / album resolution (default `defaultAlbumSize`).
+    ///   - onReady: Called after compression succeeds / transfer is ready.
+    ///   - onProgress: Progress in 0...1.
+    ///   - completion: Final result after releasing the transfer lock.
     func pushAlbumAuto(images: [UIImage],
                        size: CGSize = BleRepository.defaultAlbumSize,
                        onReady: @escaping () -> Void,
@@ -962,7 +1158,8 @@ final class BleRepository {
         }
     }
 
-    /// 对齐 HwAlbumService `resizeAndCropImage:toSize:`：等比放大后居中裁剪到目标尺寸。
+    /// Aspect-fill then center-crop to `size`, matching `HwAlbumService resizeAndCropImage:toSize:`.
+    /// Uses scale factor 1 (device-independent pixel size for the watch).
     static func resizeAndCropAlbumImage(_ image: UIImage, to size: CGSize) -> UIImage {
         guard size.width > 0, size.height > 0, image.size.width > 0, image.size.height > 0 else { return image }
         let scale = max(size.width / image.size.width, size.height / image.size.height)
@@ -977,6 +1174,9 @@ final class BleRepository {
         }
     }
 
+    /// Low-level Sifli album push. Builds `QjsAlbumModel`s named by slot index.
+    /// Re-crops if an image is not already exactly `width`×`height` because the SDK
+    /// internally uses fit (letterbox) and may not fill the display otherwise.
     func pushAlbumSifli(images: [UIImage],
                         indices: [Int]? = nil,
                         width: Double = 466,
@@ -997,7 +1197,7 @@ final class BleRepository {
             let m = QjsAlbumModel()
             let idx = indices?[safe: i] ?? (i + 1)
             m.name = "\(idx)"
-            // 再保险：保证送入 SDK 的图已是目标分辨率（SDK 内部是 fit，不保证铺满）
+            // Belt-and-suspenders: ensure SDK input is exact target size (SDK fit does not guarantee fill).
             let alreadyExact = abs(img.size.width - target.width) < 0.5 && abs(img.size.height - target.height) < 0.5
             m.image = alreadyExact ? img : Self.resizeAndCropAlbumImage(img, to: target)
             albums.append(m)
@@ -1017,6 +1217,8 @@ final class BleRepository {
         )
     }
 
+    /// JL multi-file album transfer (JPEG payload, transfer type `0x02`). Alternate path;
+    /// demo default is `pushAlbumAuto` (Sifli).
     func pushAlbumJL(images: [UIImage],
                      indices: [Int]? = nil,
                      size: CGSize = BleRepository.defaultAlbumSize,
@@ -1058,6 +1260,12 @@ final class BleRepository {
         )
     }
 
+    /// Pushes an AGPS assistance zip via Sifli (`syncZipFile`, type `3`, byte-aligned).
+    /// Acquires the exclusive transfer lock for the duration of the operation.
+    /// - Parameters:
+    ///   - zipURL: Local path to the AGPS package.
+    ///   - onProgress: Integer progress from the Sifli SDK (typically 0...100).
+    ///   - completion: Success / failure after `stop()` and lock release.
     func pushAgpsZip(zipURL: URL,
                      onProgress: @escaping (Int) -> Void,
                      completion: @escaping (Result<Void, Error>) -> Void) {
@@ -1086,16 +1294,22 @@ final class BleRepository {
 
     // MARK: - Helpers
 
+    /// Delivers a `ConnectionEvent` to all registered handlers (synchronously on the current queue;
+    /// callers of `emit` typically already hop to main).
     private func emit(_ event: ConnectionEvent) {
         connectionHandlers.forEach { $0(event) }
     }
 
+    /// Converts second-scale Unix epochs (~1e9) to milliseconds (~1e12).
+    /// Values that already look like milliseconds are returned unchanged.
     private static func normalizeEpochMs(_ value: Int64) -> Int64 {
-        // 秒级约 1e9，毫秒约 1e12
+        // Seconds ~1e9, milliseconds ~1e12.
         if value > 0 && value < 10_000_000_000 { return value * 1000 }
         return value
     }
 
+    /// Maps SDK `(ok, error)` pairs into `Result<Void, Error>`.
+    /// Prefer the explicit `error` when present; otherwise treat `ok == false` as a generic failure.
     private static func boolResult(_ ok: Bool, _ error: Error?,
                                    _ completion: (Result<Void, Error>) -> Void) {
         if let error = error { completion(.failure(error)) }
@@ -1104,6 +1318,7 @@ final class BleRepository {
     }
 }
 
+/// Safe subscript that returns `nil` instead of trapping on out-of-range indices.
 private extension Array {
     subscript(safe index: Int) -> Element? {
         indices.contains(index) ? self[index] : nil
