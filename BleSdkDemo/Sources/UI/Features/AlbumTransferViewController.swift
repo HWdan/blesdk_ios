@@ -1,15 +1,35 @@
 import UIKit
 import PhotosUI
 
+/// Demo screen for pushing album photos to a Sifli (思澈) watch.
+///
+/// # Flow (aligned with HaWoFit `HwAlbumViewController` / `HwAlbumService`)
+/// 1. Optionally query occupied album slot IDs (`getAlbumFilesIdList`).
+/// 2. Edit **target width × height** (default **466×466**). Production apps should use
+///    the product’s real display size; this demo exposes the fields for experimentation.
+/// 3. Pick up to 10 photos via `PHPickerViewController`.
+/// 4. Call `BleRepository.pushAlbumAuto`, which:
+///    - Aspect-fill + center-crops each image to the target size (APP does this before push;
+///      Sifli SDK’s own `resizeImage` only **fits** and may not fill the screen).
+///    - Allocates free slot indices in `1...50` that are not already on the watch.
+///    - Sets `SifliWatchfaceSDK.width/height` and pushes via `setPictures`.
+/// 5. Cancel maps to `SifliWatchfaceSDK.stop()` through `BleRepository.cancelTransfer`.
+///
+/// JL (JieLi) multi-file album transfer exists in the repository for parity but is not
+/// invoked from this screen.
 final class AlbumTransferViewController: UIViewController, PHPickerViewControllerDelegate, UITextFieldDelegate {
     private let repo = BleRepository.shared
     private let statusLabel = UIHelpers.makeLabel("")
     private let infoLabel = UIHelpers.makeLabel("")
+    /// Editable target width in pixels (default 466).
     private let widthField = UITextField()
+    /// Editable target height in pixels (default 466).
     private let heightField = UITextField()
     private let progress = UIProgressView(progressViewStyle: .default)
     private let logView = UITextView()
+    /// Photos loaded from the picker (original orientation / size before crop).
     private var images: [UIImage] = []
+    /// Guards against overlapping push sessions from the UI.
     private var busy = false
 
     override func viewDidLoad() {
@@ -19,6 +39,7 @@ final class AlbumTransferViewController: UIViewController, PHPickerViewControlle
         statusLabel.text = L10n.tr("feature_ready")
         infoLabel.text = L10n.tr("album_none_selected")
 
+        // Target size row — values are passed into pushAlbumAuto / SifliWatchfaceSDK.
         let sizeTitle = UIHelpers.makeLabel(L10n.tr("album_target_size_title"))
         sizeTitle.font = .preferredFont(forTextStyle: .subheadline)
         sizeTitle.textColor = .secondaryLabel
@@ -62,11 +83,13 @@ final class AlbumTransferViewController: UIViewController, PHPickerViewControlle
             heightField.heightAnchor.constraint(equalToConstant: 40)
         ])
 
+        // Dismiss the number pad when tapping outside the size fields.
         let tap = UITapGestureRecognizer(target: self, action: #selector(endEditingTap))
         tap.cancelsTouchesInView = false
         view.addGestureRecognizer(tap)
     }
 
+    /// Configures a numeric text field used for target width or height.
     private func configureSizeField(_ field: UITextField, placeholder: String, defaultValue: Int) {
         field.placeholder = placeholder
         field.text = "\(defaultValue)"
@@ -82,6 +105,8 @@ final class AlbumTransferViewController: UIViewController, PHPickerViewControlle
         view.endEditing(true)
     }
 
+    /// Parses and validates the width/height fields.
+    /// - Returns: A positive size with each side in `1...4096`, or `nil` if invalid.
     private func resolvedTargetSize() -> CGSize? {
         let w = Int(widthField.text?.trimmingCharacters(in: .whitespaces) ?? "") ?? 0
         let h = Int(heightField.text?.trimmingCharacters(in: .whitespaces) ?? "") ?? 0
@@ -89,6 +114,7 @@ final class AlbumTransferViewController: UIViewController, PHPickerViewControlle
         return CGSize(width: w, height: h)
     }
 
+    /// Lists album file / slot IDs currently stored on the watch (used to avoid collisions).
     @objc private func queryIds() {
         repo.getAlbumFileIds { [weak self] result in
             switch result {
@@ -100,6 +126,7 @@ final class AlbumTransferViewController: UIViewController, PHPickerViewControlle
         }
     }
 
+    /// Presents the system photo picker (images only, max 10).
     @objc private func pickImages() {
         var config = PHPickerConfiguration(photoLibrary: .shared())
         config.filter = .images
@@ -109,6 +136,7 @@ final class AlbumTransferViewController: UIViewController, PHPickerViewControlle
         present(picker, animated: true)
     }
 
+    /// Loads `UIImage`s from picker results asynchronously, then updates the selection label.
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
         picker.dismiss(animated: true)
         images.removeAll()
@@ -126,6 +154,7 @@ final class AlbumTransferViewController: UIViewController, PHPickerViewControlle
         }
     }
 
+    /// Validates size + selection, then starts `pushAlbumAuto` with the user-chosen resolution.
     @objc private func pushAuto() {
         guard !busy else { return }
         guard !images.isEmpty else { append(L10n.tr("album_no_files")); return }
@@ -149,6 +178,7 @@ final class AlbumTransferViewController: UIViewController, PHPickerViewControlle
             case .success:
                 self?.statusLabel.text = L10n.tr("feature_success")
                 self?.append(L10n.tr("album_push_ok"))
+                // Slot list changes after a successful push.
                 self?.queryIds()
             case .failure(let e):
                 self?.statusLabel.text = L10n.tr("feature_failed")
@@ -157,6 +187,7 @@ final class AlbumTransferViewController: UIViewController, PHPickerViewControlle
         })
     }
 
+    /// Cancels an in-flight Sifli transfer and clears the local busy flag.
     @objc private func cancelTransfer() {
         repo.cancelTransfer()
         busy = false
@@ -168,6 +199,7 @@ final class AlbumTransferViewController: UIViewController, PHPickerViewControlle
         logView.text = (logView.text ?? "") + s + "\n"
     }
 
+    /// Restricts size fields to decimal digits only.
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         if string.isEmpty { return true }
         return string.rangeOfCharacter(from: CharacterSet.decimalDigits.inverted) == nil

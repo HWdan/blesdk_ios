@@ -39,6 +39,7 @@
 "music" = "音乐推送";
 "album" = "相册推送";
 "agps" = "AGPS 更新";
+"ota" = "OTA 升级";
 "status_sdk_ready" = "SDK 就绪";
 "status_bound_local" = "已绑定本地设备，尝试重连…";
 "status_connected" = "已连接 %@";
@@ -104,7 +105,16 @@
 "unbind_step_disconnect" = "断开 BLE";
 "unbind_step_cache" = "清除连接缓存";
 "unbind_step_local" = "清除本地绑定";
-"unbind_note_ios" = "iOS 对标 removeBond 场景";
+"unbind_step_forget" = "提示：在系统蓝牙设置中忽略设备";
+"unbind_note_ios" = "iOS 无法调用 removeBond";
+"unbind_note_forget" = "仅 iOS 需要";
+"unbind_ios_banner" = "与 Android 不同，iOS 无法在 App 内清除系统蓝牙配对。解绑后请到「设置 → 蓝牙」中忽略此手表。";
+"unbind_forget_title" = "忽略此设备";
+"unbind_forget_message" = "为了把手表从本机彻底删除，请打开「设置 → 蓝牙」，找到此手表，点击「忽略此设备」。";
+"unbind_forget_settings" = "去设置";
+"unbind_forget_done" = "已忽略";
+"unbind_forget_opened_settings" = "已打开系统设置";
+"unbind_forget_user_acked" = "用户已确认";
 
 /* Goals */
 "goals_get" = "获取目标";
@@ -238,6 +248,42 @@
 "agps_processed" = "已处理 %d/%d";
 "agps_zipping" = "打包 agps_xyw.zip…";
 "agps_zip_done" = "打包完成";
+
+/* OTA (Sifli) */
+"ota_refresh" = "刷新设备信息";
+"ota_check" = "检查升级";
+"ota_start" = "开始升级";
+"ota_cancel" = "取消 OTA";
+"ota_refreshing" = "刷新中…";
+"ota_refresh_ok" = "设备信息已刷新";
+"ota_checking" = "检查升级中…";
+"ota_has_update" = "发现新版本";
+"ota_no_update" = "已是最新";
+"ota_preparing" = "准备 OTA…";
+"ota_progress" = "OTA %d%%";
+"ota_success" = "OTA 成功，设备可能重启";
+"ota_failed" = "OTA 失败";
+"ota_cancelled" = "已取消 OTA";
+"ota_mac" = "MAC: %@";
+"ota_firmware" = "固件版本: %@";
+"ota_parsed" = "解析版本: %@";
+"ota_new_version_arrow" = "→ %@";
+"ota_phase_check" = "查询服务器";
+"ota_phase_prepare" = "准备";
+"ota_phase_download" = "下载/解压";
+"ota_phase_push" = "推送到手表 (Sifli DFU)";
+"ota_phase_done" = "完成";
+"ota_battery_low" = "电量过低（%d%%），请充电至 ≥30%%";
+"ota_status_not_ready" = "设备升级状态为 %@，请稍后再试";
+"ota_log_device" = "设备 mac=%@ fw=%@";
+"ota_log_channel_sifli" = "通道: Sifli DFU";
+"ota_log_new_pkg" = "包 %@(%@)，文件数=%d";
+"ota_err_no_fw" = "固件字符串为空，请先刷新";
+"ota_err_no_package" = "无升级包";
+"ota_err_url_md5" = "固件 url/md5 缺失";
+"ota_err_unzip" = "固件解压失败";
+"ota_err_diff_resource" = "差分 OTA 需要 resource name/url/md5";
+"ota_err_no_ctrl" = "Zip 缺少 ctrl / diff_ctrl";
 
 /* Errors */
 "err_transfer_busy" = "有传输任务进行中，请先取消或等待完成";

@@ -1,5 +1,8 @@
 import UIKit
 
+/// Formats AGPS validity windows for the UI.
+/// Input timestamps are **milliseconds** since Unix epoch (see `BleRepository.getDeviceGpsStatus`,
+/// which normalizes SDK second-scale values to ms).
 enum AgpsTimeFormatter {
     private static let dateFmt: DateFormatter = {
         let f = DateFormatter()
@@ -8,6 +11,7 @@ enum AgpsTimeFormatter {
         return f
     }()
 
+    /// Builds a localized “start – end” string, or an “expired” variant when `endMs` is in the past.
     static func formatRange(startMs: Int64, endMs: Int64) -> String {
         if startMs <= 0 && endMs <= 0 { return L10n.tr("agps_valid_unknown") }
         let start = startMs > 0 ? dateFmt.string(from: Date(timeIntervalSince1970: TimeInterval(startMs) / 1000.0)) : "-"
@@ -20,6 +24,21 @@ enum AgpsTimeFormatter {
     }
 }
 
+/// Demo screen for downloading, packaging, and pushing AGPS assistance data to a Sifli watch.
+///
+/// # End-to-end flow (aligned with Android `AgpsXywBuilder` + HaWoFit AGPS update)
+/// 1. **Refresh status** — `getDeviceGpsStatus` shows clip type, firmware, and AGPS validity.
+/// 2. **Start update**:
+///    - `AgpsXywBuilder.buildSevenDayZip` downloads 5 constellation `.pgl` files,
+///      appends a 16-byte `AGPS` trailer (valid start/end UTC seconds), and zips them
+///      under the entry prefix `music/gps/agps/` (required by the watch).
+///    - Progress for the build phase is mapped roughly to the first half of the bar (0...0.5).
+///    - `BleRepository.pushAgpsZip` sends the zip via `SifliWatchfaceSDK.syncZipFile`
+///      (`type: 3`, `byteAlign: true`). Push progress fills the second half of the bar.
+/// 3. **Cancel** — `BleRepository.cancelTransfer` → `SifliWatchfaceSDK.stop()`.
+///
+/// Requires a live BLE connection; ATS / cleartext HTTP for the AGPS host must be allowed
+/// in Info.plist for the download step.
 final class AgpsUpdateViewController: UIViewController {
     private let repo = BleRepository.shared
     private let statusLabel = UIHelpers.makeLabel("")
@@ -27,8 +46,10 @@ final class AgpsUpdateViewController: UIViewController {
     private let fwLabel = UIHelpers.makeLabel("")
     private let validLabel = UIHelpers.makeLabel("")
     private let progress = UIProgressView(progressViewStyle: .default)
+    /// High-level phase text: downloading / packaging / pushing / done.
     private let phaseLabel = UIHelpers.makeLabel("")
     private let logView = UITextView()
+    /// Guards against overlapping download+push sessions.
     private var busy = false
 
     override func viewDidLoad() {
@@ -66,6 +87,7 @@ final class AgpsUpdateViewController: UIViewController {
         refreshStatus()
     }
 
+    /// Reads GPS / AGPS status from the connected watch and updates the status labels.
     @objc private func refreshStatus() {
         guard repo.isConnected() else {
             statusLabel.text = L10n.tr("status_need_connect")
@@ -89,6 +111,11 @@ final class AgpsUpdateViewController: UIViewController {
         }
     }
 
+    /// Downloads + packages AGPS files, then pushes the resulting zip over BLE.
+    ///
+    /// Progress bar mapping:
+    /// - `0.0 ... 0.5` — `AgpsXywBuilder` download / trailer / zip
+    /// - `0.5 ... 1.0` — Sifli `syncZipFile` push (`p` is typically 0...100)
     @objc private func startUpdate() {
         guard !busy else { return }
         guard repo.isConnected() else {
@@ -99,6 +126,7 @@ final class AgpsUpdateViewController: UIViewController {
         progress.progress = 0
         phaseLabel.text = L10n.tr("agps_phase_download")
         statusLabel.text = L10n.tr("agps_preparing")
+        // Unique temp directory per run so parallel / retry runs do not clash.
         let dir = FileManager.default.temporaryDirectory.appendingPathComponent("agps_\(UUID().uuidString)", isDirectory: true)
         AgpsXywBuilder.buildSevenDayZip(into: dir, onProgress: { [weak self] p in
             DispatchQueue.main.async {
@@ -122,6 +150,7 @@ final class AgpsUpdateViewController: UIViewController {
                 self.phaseLabel.text = L10n.tr("agps_phase_push")
                 self.statusLabel.text = L10n.tr("agps_pushing")
                 self.repo.pushAgpsZip(zipURL: built.zipURL, onProgress: { [weak self] p in
+                    // Map SDK 0...100 onto the second half of the progress bar.
                     self?.progress.progress = 0.5 + Float(p) / 200.0
                     self?.statusLabel.text = L10n.tr("agps_push_progress", p)
                 }, completion: { [weak self] pushResult in
@@ -132,6 +161,7 @@ final class AgpsUpdateViewController: UIViewController {
                         self?.phaseLabel.text = L10n.tr("agps_phase_done")
                         self?.progress.progress = 1
                         self?.append(L10n.tr("agps_push_ok"))
+                        // Validity window should update after a successful push.
                         self?.refreshStatus()
                     case .failure(let e):
                         self?.statusLabel.text = L10n.tr("agps_push_fail")
@@ -142,6 +172,7 @@ final class AgpsUpdateViewController: UIViewController {
         })
     }
 
+    /// Aborts an in-flight Sifli AGPS push (does not cancel an already-finished download).
     @objc private func cancelUpdate() {
         repo.cancelTransfer()
         busy = false

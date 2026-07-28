@@ -64,8 +64,8 @@ final class BleRepository {
     /// Which transfer kind currently owns the transfer lock, if any.
     private var activeTransferKind: TransferKind?
 
-    /// High-level categories of exclusive file-transfer operations.
-    enum TransferKind { case music, album, agps }
+    /// High-level categories of exclusive file-transfer / DFU operations.
+    enum TransferKind { case music, album, agps, ota }
 
     private init() {}
 
@@ -98,6 +98,7 @@ final class BleRepository {
         guard !initialized else { return }
         sdk.initSDK()
         SifliWatchfaceSDK.getInstance().initSDK()
+        SifliOtaPusher.shared.warmUp()
         initialized = true
 
         // Debounce connection-state handling by 0.3s (BleConnectManager parity).
@@ -396,9 +397,19 @@ final class BleRepository {
         startConnectBluetooth(reasonKey: "reason_foreground")
     }
 
-    // MARK: - Bind
+    // MARK: - Bind / Unbind
+    //
+    // Bind flow (see `BindFlowViewController`):
+    //   startBind → set time/user/unit/language → getDeviceInfo → endBind →
+    //   getPairState → (optional) requestDeviceToPair → Home saves BoundDeviceStore
+    //
+    // Unbind flow (see `UnbindFlowViewController`):
+    //   unbindDevice → disconnect → removeConnectionCache → clearBoundDevice →
+    //   **iOS prompt**: user must Forget This Device in Settings → Bluetooth
+    //   (Android can call removeBond; iOS cannot clear system pairing from the app).
 
-    /// Begins the device bind handshake (user confirmation / pairing flow on the watch).
+    /// Begins the device bind handshake (user confirmation on the watch).
+    /// Must be followed by config APIs and eventually `endBind`.
     func startBind(completion: @escaping (Result<Void, Error>) -> Void) {
         sdk.startBindDevice { ok, error in
             DispatchQueue.main.async { Self.boolResult(ok, error, completion) }
@@ -412,8 +423,11 @@ final class BleRepository {
         }
     }
 
-    /// Unbinds the device on the firmware side. Callers should also clear local store
-    /// and disable auto-reconnect as part of the unbind UI flow.
+    /// Notifies the watch firmware to unbind.
+    ///
+    /// This alone is **not** a full unbind on iOS: also disconnect, clear SDK cache +
+    /// local store, disable auto-reconnect, and prompt the user to forget the device
+    /// in system Bluetooth settings (no `removeBond` API).
     func unbindDevice(completion: @escaping (Result<Void, Error>) -> Void) {
         sdk.unbindDevice { ok, error in
             DispatchQueue.main.async { Self.boolResult(ok, error, completion) }
@@ -484,7 +498,9 @@ final class BleRepository {
         }
     }
 
-    /// Queries whether the phone/watch classic or BLE pairing state is established.
+    /// Queries whether the phone/watch pairing state is established.
+    /// Used during bind to decide whether `requestDeviceToPair` can be skipped.
+    /// Note: iOS has no public `createBond` / `removeBond` like Android.
     func getPairState(completion: @escaping (Result<Bool, Error>) -> Void) {
         sdk.getPairState { ok, error in
             DispatchQueue.main.async {
@@ -494,17 +510,22 @@ final class BleRepository {
         }
     }
 
-    /// Asks the device to enter pairing mode / prompt the user to pair.
+    /// Asks the device to enter pairing mode / prompt the user to pair (soft step in bind).
     func requestDeviceToPair(completion: @escaping (Result<Void, Error>) -> Void) {
         sdk.requestDeviceToPair { ok, error in
             DispatchQueue.main.async { Self.boolResult(ok, error, completion) }
         }
     }
 
-    /// Clears SDK-side connection cache (e.g. before a clean re-pair).
+    /// Clears SDK-side connection cache (part of unbind cleanup before re-pair).
     func removeConnectionCache() { sdk.removeConnectionCache() }
 
-    // MARK: - Health
+    // MARK: - Health sync
+    //
+    // `syncHealthData` mirrors Android `sync`:
+    //   1) getActivityNum (counts) → 2) pull activities / HR / sleep by count →
+    //   3) delete each non-empty category on the device → 4) return a summary string.
+    // Home may reconnect before calling this when the watch is bound but offline.
 
     /// Reads how many activity / sleep / heart-rate / HRF records are buffered on the device.
     func getHealthDataCount(completion: @escaping (Result<HealthDataCount, Error>) -> Void) {
@@ -869,6 +890,15 @@ final class BleRepository {
     }
 
     // MARK: - Music / Album / AGPS
+    //
+    // Exclusive Sifli file transfers share one lock (`beginTransfer` / `endTransfer` /
+    // `cancelTransfer`). Concurrent music, album, or AGPS pushes are rejected with
+    // `err_transfer_busy`. iOS demo paths always use SifliWatchfaceSDK; JL (classic BT)
+    // helpers remain for parity / debugging only.
+    //
+    // Music zip layout:  …/selectTemp/music/mp3/*.mp3  →  zip entries music/mp3/*
+    // Album:             resize/crop → allocate slots 1...50 → setPictures
+    // AGPS:              AgpsXywBuilder zip (music/gps/agps/*) → syncZipFile type 3
 
     /// Queries available and total music storage on the device (values in KB).
     func getMusicStorage(completion: @escaping (Result<MusicStorage, Error>) -> Void) {
@@ -949,17 +979,28 @@ final class BleRepository {
         }
     }
 
-    /// Aborts any active Sifli transfer and clears the local transfer lock.
+    /// Aborts any active Sifli transfer / OTA and clears the local transfer lock.
     func cancelTransfer() {
-        SifliWatchfaceSDK.getInstance().stop()
+        // Stop only the active channel — calling both can disturb the other BLE core.
+        switch activeTransferKind {
+        case .ota:
+            SifliOtaPusher.shared.stop()
+        case .music, .album, .agps:
+            SifliWatchfaceSDK.getInstance().stop()
+        case .none:
+            SifliWatchfaceSDK.getInstance().stop()
+            if SifliOtaPusher.shared.isWorking {
+                SifliOtaPusher.shared.stop()
+            }
+        }
         isTransferring = false
         activeTransferKind = nil
     }
 
     /// Acquires the exclusive transfer lock for `kind`.
-    /// Returns an error if another transfer (or Sifli `isWorking`) is already active.
+    /// Returns an error if another transfer (or Sifli `isWorking` / OTA) is already active.
     private func beginTransfer(_ kind: TransferKind) -> Error? {
-        if isTransferring || SifliWatchfaceSDK.getInstance().isWorking {
+        if isTransferring || SifliWatchfaceSDK.getInstance().isWorking || SifliOtaPusher.shared.isWorking {
             return SdkError(code: -1, message: L10n.tr("err_transfer_busy"))
         }
         isTransferring = true
@@ -973,12 +1014,18 @@ final class BleRepository {
         activeTransferKind = nil
     }
 
-    /// Preferred music push entry for iOS: always uses Sifli push and does not require classic BT.
-    /// Acquires the transfer lock, stages files under a temp `music/mp3` tree, then pushes.
+    /// Preferred music push entry for iOS: always uses Sifli and does **not** require classic BT.
+    ///
+    /// Steps:
+    /// 1. Acquire the exclusive transfer lock (`.music`).
+    /// 2. Stage MP3s under a temp `…/selectTemp/music/mp3/` tree (`pushMusicSifliInternal`).
+    /// 3. Call `SifliWatchfaceSDK.setMusicFiles` (compress → BLE push).
+    /// 4. On finish: `stop()`, delete temp root, release lock.
+    ///
     /// - Parameters:
     ///   - fileURLs: Source MP3 file URLs selected by the user.
     ///   - onReady: Invoked when packaging/compression succeeds and transfer is about to start.
-    ///   - onProgress: Transfer progress in 0...1.
+    ///   - onProgress: Transfer progress in `0...1` (SDK reports 0...100).
     ///   - completion: Final success / failure after cleanup.
     func pushMusicAuto(fileURLs: [URL],
                        onReady: @escaping () -> Void,
@@ -990,19 +1037,19 @@ final class BleRepository {
 
     /// Stages selected MP3s into `…/selectTemp/music/mp3/` then calls `pushMusicSifli`.
     ///
-    /// Path layout matches HaWoFit `HwMusicService`: `SifliWatchfaceSDK.packageQjsMp3`
-    /// strips the last path component and zips the `music` directory. The zip must contain
-    /// `music/mp3/*.mp3` or the watch returns error code 22 when starting a single-file session.
+    /// Path layout matches HaWoFit `HwMusicService.getMusicSelectTempPath`:
+    /// `SifliWatchfaceSDK.packageQjsMp3` strips the last path component and zips the `music`
+    /// directory. The zip **must** contain `music/mp3/*.mp3`; a flat folder causes the watch
+    /// to return error code **22** when starting a single-file session.
     private func pushMusicSifliInternal(fileURLs: [URL],
                                         onReady: @escaping () -> Void,
                                         onProgress: @escaping (Float) -> Void,
                                         completion: @escaping (Result<Void, Error>) -> Void) {
-        // HaWoFit HwMusicService: directory must be …/music/mp3.
-        // SifliWatchfaceSDK.packageQjsMp3 deletes the last path component then zips `music`;
-        // zip contents must be music/mp3/*.mp3 or the watch returns error 22.
+        // Unique root per push so concurrent / retry runs do not share directories.
         let fm = FileManager.default
         let root = fm.temporaryDirectory
             .appendingPathComponent("qjs_musics_\(UUID().uuidString)", isDirectory: true)
+        // Must end with …/music/mp3 — packageQjsMp3 deletes "mp3" then zips "music".
         let mp3Dir = root.appendingPathComponent("selectTemp/music/mp3", isDirectory: true)
         do {
             try fm.createDirectory(at: mp3Dir, withIntermediateDirectories: true)
@@ -1014,6 +1061,7 @@ final class BleRepository {
 
         var copied = 0
         for url in fileURLs {
+            // Sanitize names like HwMusicViewController (spaces / special chars removed).
             let name = Self.sanitizeMusicFileName(url.lastPathComponent)
             let dest = mp3Dir.appendingPathComponent(name)
             do {
@@ -1030,6 +1078,7 @@ final class BleRepository {
             return
         }
 
+        // onCompress(true) ≈ packaging done; map SDK Int progress (0...100) to Float 0...1.
         pushMusicSifli(directoryURL: mp3Dir, onCompress: { ok in
             if ok { onReady() }
         }, onProgress: { p in
@@ -1121,12 +1170,18 @@ final class BleRepository {
     static let defaultAlbumSize = CGSize(width: 466, height: 466)
 
     /// Preferred album push entry: acquires transfer lock, resizes/crops images, allocates
-    /// free album slots (1...50), then pushes via Sifli.
+    /// free album slots (`1...50`), then pushes via Sifli `setPictures`.
+    ///
+    /// Steps:
+    /// 1. Aspect-fill + center-crop every image to `size` (default 466×466).
+    /// 2. Query occupied IDs and pick free slot indices for the batch.
+    /// 3. Set `SifliWatchfaceSDK.width/height` and push `QjsAlbumModel`s named by slot index.
+    ///
     /// - Parameters:
-    ///   - images: Source photos from the picker.
-    ///   - size: Target watchface / album resolution (default `defaultAlbumSize`).
+    ///   - images: Source photos from the picker (any size / orientation).
+    ///   - size: Target watch album resolution (UI-editable on the album demo screen).
     ///   - onReady: Called after compression succeeds / transfer is ready.
-    ///   - onProgress: Progress in 0...1.
+    ///   - onProgress: Progress in `0...1`.
     ///   - completion: Final result after releasing the transfer lock.
     func pushAlbumAuto(images: [UIImage],
                        size: CGSize = BleRepository.defaultAlbumSize,
@@ -1134,6 +1189,7 @@ final class BleRepository {
                        onProgress: @escaping (Float) -> Void,
                        completion: @escaping (Result<Void, Error>) -> Void) {
         if let err = beginTransfer(.album) { completion(.failure(err)); return }
+        // Crop before slot allocation so we fail fast on empty / invalid batches only via indices.
         let prepared = images.map { Self.resizeAndCropAlbumImage($0, to: size) }
         allocateAlbumIndices(count: prepared.count) { [weak self] idxResult in
             guard let self = self else { return }
@@ -1260,11 +1316,14 @@ final class BleRepository {
         )
     }
 
-    /// Pushes an AGPS assistance zip via Sifli (`syncZipFile`, type `3`, byte-aligned).
+    /// Pushes an AGPS assistance zip via Sifli (`syncZipFile`, `type: 3`, `byteAlign: true`).
+    ///
+    /// The zip must already contain entries under `music/gps/agps/` (see `AgpsXywBuilder`).
     /// Acquires the exclusive transfer lock for the duration of the operation.
+    ///
     /// - Parameters:
-    ///   - zipURL: Local path to the AGPS package.
-    ///   - onProgress: Integer progress from the Sifli SDK (typically 0...100).
+    ///   - zipURL: Local path to the AGPS package produced by `AgpsXywBuilder`.
+    ///   - onProgress: Integer progress from the Sifli SDK (typically `0...100`).
     ///   - completion: Success / failure after `stop()` and lock release.
     func pushAgpsZip(zipURL: URL,
                      onProgress: @escaping (Int) -> Void,
@@ -1275,6 +1334,7 @@ final class BleRepository {
             completion(.failure(SdkError(code: -1, message: "no connected uuid")))
             return
         }
+        // type 3 = AGPS / offline-map style zip push in SifliWatchfaceSDK; byteAlign matches APP.
         SifliWatchfaceSDK.getInstance().syncZipFile(
             devIdentifier: uuid,
             filePath: zipURL,
@@ -1290,6 +1350,108 @@ final class BleRepository {
                 }
             }
         )
+    }
+
+    // MARK: - Sifli OTA (firmware DFU)
+    //
+    // Demo flow mirrors Android `OtaUpgradeFragment` / ViewModel:
+    //   refresh device info → check server → download/unzip → SFOTAManager.startOTANand
+    // Push implementation mirrors HaWoFit `OtaHandler.startSifliOta` (Sifli only).
+
+    /// Reads battery percentage (0...100) from the watch.
+    func getBattery(completion: @escaping (Result<Int, Error>) -> Void) {
+        sdk.getBatteryWithCallback { value, error in
+            DispatchQueue.main.async {
+                if let error = error { completion(.failure(error)) }
+                else { completion(.success(Int(value))) }
+            }
+        }
+    }
+
+    /// Explicit firmware version string query (some devices omit it in `getDeviceInfo`).
+    func getFirmwareVersion(completion: @escaping (Result<String, Error>) -> Void) {
+        sdk.getFirmwareVersion { value, error in
+            DispatchQueue.main.async {
+                if let error = error { completion(.failure(error)) }
+                else { completion(.success(value ?? "")) }
+            }
+        }
+    }
+
+    /// Device upgrade state (`none` required before starting a new OTA).
+    func getDeviceUpgradeStatus(completion: @escaping (Result<HwDeviceUpgradeState, Error>) -> Void) {
+        sdk.getDeviceUpgradeStatus { state, error in
+            DispatchQueue.main.async {
+                if let error = error { completion(.failure(error)) }
+                else { completion(.success(state)) }
+            }
+        }
+    }
+
+    /// Full Sifli OTA: prepare package from [info], then NAND DFU.
+    ///
+    /// Progress mapping (aligned with Android demo UI):
+    /// - `0...40` prepare (download / unzip)
+    /// - `40...100` DFU push
+    ///
+    /// After prepare, waits ~1.5s before `startOTANand` (Android / HaWoFit timing) so the
+    /// OTA BLE core is ready. `resourcePath` is omitted for full packages.
+    func startSifliOta(info: OtaUpgradeInfo,
+                       onProgress: @escaping (Int, String) -> Void,
+                       onLog: ((String) -> Void)? = nil,
+                       completion: @escaping (Result<Void, Error>) -> Void) {
+        if let err = beginTransfer(.ota) { completion(.failure(err)); return }
+        guard connectedUUID() != nil else {
+            endTransfer()
+            completion(.failure(SdkError(code: -1, message: "no connected uuid")))
+            return
+        }
+        // Disable auto-reconnect for the DFU window (HaWoFit also keeps reconnect quiet during OTA).
+        setAutoReconnectEnabled(false)
+
+        DispatchQueue.global(qos: .userInitiated).async {
+            do {
+                let package = try SifliOtaPusher.shared.preparePackage(info: info) { pct in
+                    DispatchQueue.main.async {
+                        onProgress(Int(Double(pct) * 0.4), L10n.tr("ota_phase_download"))
+                    }
+                }
+                DispatchQueue.main.async {
+                    onLog?(package.debugSummary)
+                    onProgress(40, L10n.tr("ota_phase_push"))
+                    // Re-read UUID after prepare (still need a live connection identity).
+                    guard let uuid = self.connectedUUID() else {
+                        self.endTransfer()
+                        completion(.failure(SdkError(code: -1, message: "no connected uuid")))
+                        return
+                    }
+                    onLog?("DFU target uuid=\(uuid)")
+                    // Quiet SFDial BLE core before Sifli OTA starts its own CBCentralManager.
+                    SifliWatchfaceSDK.getInstance().stop()
+                    // Android OtaUpgradeFragment delays 1.5s before startActionDFUNand.
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                        guard self.activeTransferKind == .ota else { return }
+                        SifliOtaPusher.shared.startDFU(
+                            devIdentifier: uuid,
+                            package: package,
+                            onProgress: { p in
+                                onProgress(40 + Int(Double(p) * 0.6), L10n.tr("ota_phase_push"))
+                            },
+                            onLog: onLog,
+                            completion: { [weak self] result in
+                                self?.endTransfer()
+                                completion(result)
+                            }
+                        )
+                    }
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    self.endTransfer()
+                    completion(.failure(error))
+                }
+            }
+        }
     }
 
     // MARK: - Helpers

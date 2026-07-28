@@ -1,0 +1,13 @@
+# Xcode / macOS
+.DS_Store
+xcuserdata/
+*.xcuserstate
+DerivedData/
+build/
+
+# CocoaPods (run `pod install` after clone)
+Pods/
+
+# Misc
+*.swp
+*~.nib

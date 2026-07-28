@@ -1,7 +1,26 @@
 import UIKit
 
+/// Step-by-step **device bind** demo screen, aligned with Android bind + HaWoFit post-bind setup.
+///
+/// # Pipeline (`runStep`)
+/// 0. `startBindDevice` — watch-side confirmation (hard fail stops the flow)
+/// 1. `setDeviceTime` — sync phone wall clock (24h)
+/// 2. `setUserInfo` — demo profile (gender / age / height / weight)
+/// 3. `setUnit` — metric
+/// 4. `setLanguage` — demo language
+/// 5. `getDeviceInfo` — firmware / MAC / battery; used later for local persistence
+/// 6. `endBindDevice` — close the bind session on the firmware
+/// 7. `getPairState` — check classic / system pairing
+/// 8. `requestDeviceToPair` — soft step; skipped if already paired (iOS has no `createBond`)
+/// 9. Local “save bind” marker — actual `BoundDeviceStore` write happens in `HomeViewController`
+///    when `onFinished(true, deviceInfo)` returns
+///
+/// Hard steps (`finishHard`) abort on failure and re-enable **Start**.
+/// Soft steps (`finishSoft`) mark failure as skipped and continue.
 final class BindFlowViewController: UIViewController {
     private let repo = BleRepository.shared
+    /// Called after dismiss. `success` is true only when every hard step completed;
+    /// `deviceInfo` is the payload from step 5 (may be nil if that step failed earlier).
     var onFinished: ((Bool, BleDeviceInfoModel?) -> Void)?
 
     private var steps: [FlowStep] = []
@@ -52,6 +71,7 @@ final class BindFlowViewController: UIViewController {
         ])
     }
 
+    /// User cancelled before completion — report `success == false`.
     @objc private func close() {
         dismiss(animated: true) { self.onFinished?(false, nil) }
     }
@@ -61,12 +81,14 @@ final class BindFlowViewController: UIViewController {
         runStep(0)
     }
 
+    /// Executes bind steps sequentially. When `index == steps.count`, dismisses and reports success.
     private func runStep(_ index: Int) {
         guard index < steps.count else {
             dismiss(animated: true) { self.onFinished?(true, self.deviceInfo) }
             return
         }
         mark(index, .running)
+        // Hard failure: stop the chain and allow retry.
         let finishHard: (Result<Void, Error>) -> Void = { [weak self] result in
             guard let self = self else { return }
             switch result {
@@ -78,6 +100,7 @@ final class BindFlowViewController: UIViewController {
                 self.startButton.isEnabled = true
             }
         }
+        // Soft failure: mark skipped and continue (used for optional pairing).
         let finishSoft: (Result<Void, Error>) -> Void = { [weak self] result in
             guard let self = self else { return }
             switch result {
@@ -94,6 +117,7 @@ final class BindFlowViewController: UIViewController {
         case 3: repo.setUnitMetric(completion: finishHard)
         case 4: repo.setLanguage(completion: finishHard)
         case 5:
+            // Capture device info for Home to persist MAC / firmware after this VC dismisses.
             repo.getDeviceInfo { [weak self] result in
                 guard let self = self else { return }
                 switch result {
@@ -109,6 +133,7 @@ final class BindFlowViewController: UIViewController {
             }
         case 6: repo.endBind(completion: finishHard)
         case 7:
+            // If already paired, skip `requestDeviceToPair` (step 8).
             repo.getPairState { [weak self] result in
                 guard let self = self else { return }
                 switch result {
@@ -127,6 +152,7 @@ final class BindFlowViewController: UIViewController {
             }
         case 8: repo.requestDeviceToPair(completion: finishSoft)
         case 9:
+            // UI-only marker; `HomeViewController` writes BoundDeviceStore on success callback.
             mark(index, .done, L10n.tr("detail_save_local"))
             runStep(index + 1)
         default:

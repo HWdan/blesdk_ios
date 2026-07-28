@@ -35,7 +35,12 @@ final class FlowStepCell: UITableViewCell {
 
     func configure(_ step: FlowStep) {
         apiLabel.text = step.api
-        descLabel.text = step.description
+        // Prefer description + optional platform note so iOS-only caveats are visible in the list.
+        if let note = step.platformNote, !note.isEmpty {
+            descLabel.text = "\(step.description)\n(\(note))"
+        } else {
+            descLabel.text = step.description
+        }
         detailLabel.text = step.detail
         detailLabel.isHidden = (step.detail ?? "").isEmpty
         switch step.status {

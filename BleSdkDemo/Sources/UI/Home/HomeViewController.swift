@@ -1,5 +1,9 @@
 import UIKit
 
+/// Home hub for scan/connect, bind, health sync, unbind, disconnect, and feature demos.
+///
+/// Bind / sync / unbind entry points live in the Actions section below and present
+/// `BindFlowViewController` / `UnbindFlowViewController` or call `syncHealthData`.
 final class HomeViewController: UIViewController {
     private let repo = BleRepository.shared
 
@@ -109,9 +113,9 @@ final class HomeViewController: UIViewController {
 
         let featureActions: [Selector] = [
             #selector(tapGoals), #selector(tapAlarms), #selector(tapNotify),
-            #selector(tapMusic), #selector(tapAlbum), #selector(tapAgps)
+            #selector(tapMusic), #selector(tapAlbum), #selector(tapAgps), #selector(tapOta)
         ]
-        // Goals|Alarms, Notify, Music|Album, Agps
+        // Goals|Alarms, Notify, Music|Album, Agps|OTA
         let g = UIHelpers.makeButton(""); g.addTarget(self, action: #selector(tapGoals), for: .touchUpInside)
         let a = UIHelpers.makeButton(""); a.addTarget(self, action: #selector(tapAlarms), for: .touchUpInside)
         content.addArrangedSubview(makeRow([g, a]))
@@ -127,8 +131,9 @@ final class HomeViewController: UIViewController {
         actionButtons.append(contentsOf: [m, al])
 
         let ag = UIHelpers.makeButton(""); ag.addTarget(self, action: #selector(tapAgps), for: .touchUpInside)
-        content.addArrangedSubview(ag)
-        actionButtons.append(ag)
+        let ota = UIHelpers.makeButton(""); ota.addTarget(self, action: #selector(tapOta), for: .touchUpInside)
+        content.addArrangedSubview(makeRow([ag, ota]))
+        actionButtons.append(contentsOf: [ag, ota])
         _ = featureActions
     }
 
@@ -163,7 +168,7 @@ final class HomeViewController: UIViewController {
             L10n.tr("scan_connect"), L10n.tr("bind_watch"), L10n.tr("sync_data"),
             L10n.tr("unbind_watch"), L10n.tr("disconnect"),
             L10n.tr("goals"), L10n.tr("alarms"), L10n.tr("notify"),
-            L10n.tr("music"), L10n.tr("album"), L10n.tr("agps")
+            L10n.tr("music"), L10n.tr("album"), L10n.tr("agps"), L10n.tr("ota")
         ]
         for (i, t) in titles.enumerated() where i < actionButtons.count {
             actionButtons[i].setTitle(t, for: .normal)
@@ -255,13 +260,13 @@ final class HomeViewController: UIViewController {
         let canUnbind = !busy && bound
         let canFeature = !busy && hasDevice && (bound || phase == .connected)
 
-        guard actionButtons.count >= 11 else { return }
+        guard actionButtons.count >= 12 else { return }
         actionButtons[0].isEnabled = !busy
         actionButtons[1].isEnabled = canBind
         actionButtons[2].isEnabled = canSync
         actionButtons[3].isEnabled = canUnbind
         actionButtons[4].isEnabled = !busy && hasDevice
-        for i in 5..<11 { actionButtons[i].isEnabled = canFeature }
+        for i in 5..<12 { actionButtons[i].isEnabled = canFeature }
 
         if busy { statusSpinner.startAnimating() } else { statusSpinner.stopAnimating() }
     }
@@ -288,7 +293,7 @@ final class HomeViewController: UIViewController {
         return true
     }
 
-    // MARK: - Actions
+    // MARK: - Actions (bind / sync / unbind)
 
     @objc private func tapScan() {
         let vc = ScanConnectViewController()
@@ -302,6 +307,9 @@ final class HomeViewController: UIViewController {
         navigationController?.pushViewController(vc, animated: true)
     }
 
+    /// Presents `BindFlowViewController`. On success:
+    /// - marks local `bound`, enables auto-reconnect, and persists `BoundDeviceStore`
+    ///   (Android `setBind` equivalent — iOS has no system bind flag beyond pairing).
     @objc private func tapBind() {
         guard repo.isConnected() else { return }
         let vc = BindFlowViewController()
@@ -322,6 +330,8 @@ final class HomeViewController: UIViewController {
         present(nav, animated: true)
     }
 
+    /// Health data sync entry. If BLE is down but a bound MAC exists, reconnects first
+    /// then runs `BleRepository.syncHealthData` (count → fetch → delete on device).
     @objc private func tapSync() {
         guard !busy else { return }
         guard bound || phase == .connected || device != nil else {
@@ -357,6 +367,7 @@ final class HomeViewController: UIViewController {
         if repo.isConnected() {
             runSync()
         } else if let mac = device?.macAddress ?? repo.loadBoundDevice()?.macAddress, !mac.isEmpty {
+            // Align Android: allow “sync” to reconnect then pull when bound but offline.
             repo.connect(mac: mac) { [weak self] result in
                 switch result {
                 case .success:
@@ -378,12 +389,16 @@ final class HomeViewController: UIViewController {
         }
     }
 
+    /// Presents `UnbindFlowViewController`. Disables auto-reconnect first.
+    /// On success, clears home bind state. The flow itself prompts the user to
+    /// **Forget This Device** in system Bluetooth settings (iOS cannot `removeBond`).
     @objc private func tapUnbind() {
         repo.setAutoReconnectEnabled(false)
         phase = .unbinding
         let vc = UnbindFlowViewController()
         vc.onFinished = { [weak self] success in
             guard let self = self, success else {
+                // User cancelled mid-flow — restore reconnect if still considered bound.
                 self?.phase = self?.bound == true ? .bound : .connected
                 if self?.bound == true {
                     self?.repo.setAutoReconnectEnabled(true)
@@ -441,6 +456,10 @@ final class HomeViewController: UIViewController {
     @objc private func tapAgps() {
         guard requireConnectedFeature() else { return }
         navigationController?.pushViewController(AgpsUpdateViewController(), animated: true)
+    }
+    @objc private func tapOta() {
+        guard requireConnectedFeature() else { return }
+        navigationController?.pushViewController(OtaUpgradeViewController(), animated: true)
     }
 }
 

@@ -39,6 +39,7 @@
 "music" = "Music Transfer";
 "album" = "Album Transfer";
 "agps" = "AGPS Update";
+"ota" = "OTA Upgrade";
 "status_sdk_ready" = "SDK ready";
 "status_bound_local" = "Bound locally, reconnecting…";
 "status_connected" = "Connected %@";
@@ -104,7 +105,16 @@
 "unbind_step_disconnect" = "Disconnect BLE";
 "unbind_step_cache" = "Clear connection cache";
 "unbind_step_local" = "Clear local binding";
-"unbind_note_ios" = "iOS equivalent of removeBond";
+"unbind_step_forget" = "Prompt: forget device in system Bluetooth settings";
+"unbind_note_ios" = "iOS cannot call removeBond";
+"unbind_note_forget" = "Required on iOS only";
+"unbind_ios_banner" = "Unlike Android, iOS cannot remove the system Bluetooth pairing in-app. After unbind you must forget the watch in Settings → Bluetooth.";
+"unbind_forget_title" = "Forget This Device";
+"unbind_forget_message" = "To completely remove the watch from this iPhone, open Settings → Bluetooth, find this watch, and tap Forget This Device.";
+"unbind_forget_settings" = "Settings";
+"unbind_forget_done" = "I have forgotten it";
+"unbind_forget_opened_settings" = "Opened system settings";
+"unbind_forget_user_acked" = "User acknowledged";
 
 /* Goals */
 "goals_get" = "Get goals";
@@ -238,6 +248,42 @@
 "agps_processed" = "Processed %d/%d";
 "agps_zipping" = "Packing agps_xyw.zip…";
 "agps_zip_done" = "Zip done";
+
+/* OTA (Sifli) */
+"ota_refresh" = "Refresh device info";
+"ota_check" = "Check update";
+"ota_start" = "Start upgrade";
+"ota_cancel" = "Cancel OTA";
+"ota_refreshing" = "Refreshing…";
+"ota_refresh_ok" = "Device info refreshed";
+"ota_checking" = "Checking update…";
+"ota_has_update" = "Update available";
+"ota_no_update" = "Already up to date";
+"ota_preparing" = "Preparing OTA…";
+"ota_progress" = "OTA %d%%";
+"ota_success" = "OTA succeeded; device may reboot";
+"ota_failed" = "OTA failed";
+"ota_cancelled" = "OTA cancelled";
+"ota_mac" = "MAC: %@";
+"ota_firmware" = "Firmware: %@";
+"ota_parsed" = "Parsed: %@";
+"ota_new_version_arrow" = "→ %@";
+"ota_phase_check" = "Check server";
+"ota_phase_prepare" = "Prepare";
+"ota_phase_download" = "Download / Unzip";
+"ota_phase_push" = "Push to watch (Sifli DFU)";
+"ota_phase_done" = "Done";
+"ota_battery_low" = "Battery too low (%d%%). Charge to ≥30%%";
+"ota_status_not_ready" = "Device upgrade status is %@. Try again later";
+"ota_log_device" = "Device mac=%@ fw=%@";
+"ota_log_channel_sifli" = "Channel: Sifli DFU";
+"ota_log_new_pkg" = "Package %@(%@), files=%d";
+"ota_err_no_fw" = "Firmware string empty; refresh first";
+"ota_err_no_package" = "No upgrade package";
+"ota_err_url_md5" = "Firmware url/md5 missing";
+"ota_err_unzip" = "Failed to unzip firmware";
+"ota_err_diff_resource" = "Diff OTA requires resource name/url/md5";
+"ota_err_no_ctrl" = "Zip missing ctrl / diff_ctrl";
 
 /* Errors */
 "err_transfer_busy" = "A transfer is in progress. Cancel or wait.";
