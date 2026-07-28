@@ -1,0 +1,519 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		00E969A51CB6E42102A86C30 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E507F2715CCBFC3539CF51B0 /* SceneDelegate.swift */; };
+		0D0235AFA30893525BC31F47 /* BoundDeviceStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87533339C8C8D14D102294FB /* BoundDeviceStore.swift */; };
+		22A434D7817C3ABFCE164DA2 /* LocaleHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D641DF46CA811EC15937CA3B /* LocaleHelper.swift */; };
+		22C33A9279D5EA3A3CBD2212 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF973DBBA57A72AE5FA132E6 /* HomeViewController.swift */; };
+		2ABB1804C393B97C83F072C5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD34F1A20A84C7AACA9F5217 /* AppDelegate.swift */; };
+		4043D3E7EAE75DFCBFC01948 /* Pods_BleSdkDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BE8ECD6A805F604CDAF2F877 /* Pods_BleSdkDemo.framework */; };
+		44010A3A4D82EB2AFC52A23F /* AgpsUpdateViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F289D7F6270E8765A9AC88D /* AgpsUpdateViewController.swift */; };
+		57AB498C14A031233E7137CE /* UnbindFlowViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6579266C6513A7C238F54CFD /* UnbindFlowViewController.swift */; };
+		61331A87A76AF27CCAE6BB3C /* FeatureViewControllers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EB3FAFDA08BFDBE6F331860 /* FeatureViewControllers.swift */; };
+		6B93AC57E3937E4122FF9AEB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D4A3290874E6684FE560CA97 /* Assets.xcassets */; };
+		78CDE3DB7180C2C7D3A311C0 /* BindFlowViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5D8C7D3541C7418C8C259A3 /* BindFlowViewController.swift */; };
+		967F85E9ED40606E038B2AFE /* UIHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF4B2DF9A98E169FCD7FCF4A /* UIHelpers.swift */; };
+		A4DD2DB75BFD6090F4F24888 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 263E62A0F02F78926C2B2AD0 /* Localizable.strings */; };
+		A55959D7EDBC03437D883E7C /* AlbumTransferViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2350CCE1DD1241DA119C437D /* AlbumTransferViewController.swift */; };
+		AAE5C3D38B3D927A753D971D /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3265F80EF513B9C44DAA853D /* Models.swift */; };
+		D3FE14D92024E0D8021DE4A0 /* AgpsXywBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7866CD6110555D10C1B45FC7 /* AgpsXywBuilder.swift */; };
+		EBF773BDBEDA0F71E4A49AC3 /* MusicTransferViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02A439A6EEAD381A87B7EC56 /* MusicTransferViewController.swift */; };
+		F09128AE8E68FF456D06F337 /* BleRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CE3ACBC85F1464CFBD24481 /* BleRepository.swift */; };
+		FA1FC6D717D864F8AE1B028B /* ScanConnectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282A2946747604440754D4FC /* ScanConnectViewController.swift */; };
+		FEEA3A09CC63A1BDAA031D6A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 502C1CD344A9B5AA834FD48A /* Foundation.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		02A439A6EEAD381A87B7EC56 /* MusicTransferViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MusicTransferViewController.swift; path = BleSdkDemo/Sources/UI/Features/MusicTransferViewController.swift; sourceTree = "<group>"; };
+		02A8DA414DFF28C5715D598F /* en */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		0E068E6BDBB8DB2E38460209 /* zh-Hans */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		1F289D7F6270E8765A9AC88D /* AgpsUpdateViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AgpsUpdateViewController.swift; path = BleSdkDemo/Sources/UI/Features/AgpsUpdateViewController.swift; sourceTree = "<group>"; };
+		2350CCE1DD1241DA119C437D /* AlbumTransferViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AlbumTransferViewController.swift; path = BleSdkDemo/Sources/UI/Features/AlbumTransferViewController.swift; sourceTree = "<group>"; };
+		268CE53F9A6695DAD2B6F851 /* Pods-BleSdkDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BleSdkDemo.debug.xcconfig"; path = "Target Support Files/Pods-BleSdkDemo/Pods-BleSdkDemo.debug.xcconfig"; sourceTree = "<group>"; };
+		282A2946747604440754D4FC /* ScanConnectViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ScanConnectViewController.swift; path = BleSdkDemo/Sources/UI/Scan/ScanConnectViewController.swift; sourceTree = "<group>"; };
+		2CE3ACBC85F1464CFBD24481 /* BleRepository.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BleRepository.swift; path = BleSdkDemo/Sources/Services/BleRepository.swift; sourceTree = "<group>"; };
+		3265F80EF513B9C44DAA853D /* Models.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Models.swift; path = BleSdkDemo/Sources/Models/Models.swift; sourceTree = "<group>"; };
+		502C1CD344A9B5AA834FD48A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		54B5306B5EFC774661A5DB60 /* BleSdkDemo-Bridging-Header.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "BleSdkDemo-Bridging-Header.h"; path = "BleSdkDemo/Supporting/BleSdkDemo-Bridging-Header.h"; sourceTree = "<group>"; };
+		6579266C6513A7C238F54CFD /* UnbindFlowViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = UnbindFlowViewController.swift; path = BleSdkDemo/Sources/UI/Unbind/UnbindFlowViewController.swift; sourceTree = "<group>"; };
+		6EB3FAFDA08BFDBE6F331860 /* FeatureViewControllers.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FeatureViewControllers.swift; path = BleSdkDemo/Sources/UI/Features/FeatureViewControllers.swift; sourceTree = "<group>"; };
+		7866CD6110555D10C1B45FC7 /* AgpsXywBuilder.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AgpsXywBuilder.swift; path = BleSdkDemo/Sources/Services/AgpsXywBuilder.swift; sourceTree = "<group>"; };
+		87533339C8C8D14D102294FB /* BoundDeviceStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BoundDeviceStore.swift; path = BleSdkDemo/Sources/Services/BoundDeviceStore.swift; sourceTree = "<group>"; };
+		87FCCB64FDE7373D4B06F7CF /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; name = Info.plist; path = BleSdkDemo/Supporting/Info.plist; sourceTree = "<group>"; };
+		A5D8C7D3541C7418C8C259A3 /* BindFlowViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BindFlowViewController.swift; path = BleSdkDemo/Sources/UI/Bind/BindFlowViewController.swift; sourceTree = "<group>"; };
+		B92CD49F96805BB5F5B2F353 /* BleSdkDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BleSdkDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		BD34F1A20A84C7AACA9F5217 /* AppDelegate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = BleSdkDemo/Sources/AppDelegate.swift; sourceTree = "<group>"; };
+		BE8ECD6A805F604CDAF2F877 /* Pods_BleSdkDemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BleSdkDemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C0750C526CA9AF7D8D9860FE /* Pods-BleSdkDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BleSdkDemo.release.xcconfig"; path = "Target Support Files/Pods-BleSdkDemo/Pods-BleSdkDemo.release.xcconfig"; sourceTree = "<group>"; };
+		CF4B2DF9A98E169FCD7FCF4A /* UIHelpers.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = UIHelpers.swift; path = BleSdkDemo/Sources/UI/Common/UIHelpers.swift; sourceTree = "<group>"; };
+		CF973DBBA57A72AE5FA132E6 /* HomeViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = HomeViewController.swift; path = BleSdkDemo/Sources/UI/Home/HomeViewController.swift; sourceTree = "<group>"; };
+		D4A3290874E6684FE560CA97 /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = BleSdkDemo/Resources/Assets.xcassets; sourceTree = "<group>"; };
+		D641DF46CA811EC15937CA3B /* LocaleHelper.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LocaleHelper.swift; path = BleSdkDemo/Sources/Services/LocaleHelper.swift; sourceTree = "<group>"; };
+		E507F2715CCBFC3539CF51B0 /* SceneDelegate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SceneDelegate.swift; path = BleSdkDemo/Sources/SceneDelegate.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		E0F1E080ECCFD997563841AE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FEEA3A09CC63A1BDAA031D6A /* Foundation.framework in Frameworks */,
+				4043D3E7EAE75DFCBFC01948 /* Pods_BleSdkDemo.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		4823BF48154523495E4FB678 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				D641DF46CA811EC15937CA3B /* LocaleHelper.swift */,
+			);
+			name = Services;
+			sourceTree = "<group>";
+		};
+		493D0E0101AE09698F4221FD /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				C0750C526CA9AF7D8D9860FE /* Pods-BleSdkDemo.release.xcconfig */,
+				268CE53F9A6695DAD2B6F851 /* Pods-BleSdkDemo.debug.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		509F9AD6F363D527DCFD01DD /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				263E62A0F02F78926C2B2AD0 /* Localizable.strings */,
+			);
+			name = Resources;
+			path = BleSdkDemo/Resources;
+			sourceTree = "<group>";
+		};
+		86959BAC38CE7F658C5C4F10 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				4823BF48154523495E4FB678 /* Services */,
+			);
+			name = Sources;
+			sourceTree = "<group>";
+		};
+		A80D2BDC1A58F291CD3CF048 = {
+			isa = PBXGroup;
+			children = (
+				D8342B555C7C0D7CE71C1189 /* Products */,
+				E5E7D560CA1A32DE7B7F88DF /* Frameworks */,
+				BF7F42A186110E0A0AE1D6A4 /* BleSdkDemo */,
+				493D0E0101AE09698F4221FD /* Pods */,
+			);
+			sourceTree = "<group>";
+		};
+		BF7F42A186110E0A0AE1D6A4 /* BleSdkDemo */ = {
+			isa = PBXGroup;
+			children = (
+				BD34F1A20A84C7AACA9F5217 /* AppDelegate.swift */,
+				3265F80EF513B9C44DAA853D /* Models.swift */,
+				E507F2715CCBFC3539CF51B0 /* SceneDelegate.swift */,
+				7866CD6110555D10C1B45FC7 /* AgpsXywBuilder.swift */,
+				2CE3ACBC85F1464CFBD24481 /* BleRepository.swift */,
+				87533339C8C8D14D102294FB /* BoundDeviceStore.swift */,
+				A5D8C7D3541C7418C8C259A3 /* BindFlowViewController.swift */,
+				CF4B2DF9A98E169FCD7FCF4A /* UIHelpers.swift */,
+				1F289D7F6270E8765A9AC88D /* AgpsUpdateViewController.swift */,
+				2350CCE1DD1241DA119C437D /* AlbumTransferViewController.swift */,
+				6EB3FAFDA08BFDBE6F331860 /* FeatureViewControllers.swift */,
+				02A439A6EEAD381A87B7EC56 /* MusicTransferViewController.swift */,
+				CF973DBBA57A72AE5FA132E6 /* HomeViewController.swift */,
+				282A2946747604440754D4FC /* ScanConnectViewController.swift */,
+				6579266C6513A7C238F54CFD /* UnbindFlowViewController.swift */,
+				54B5306B5EFC774661A5DB60 /* BleSdkDemo-Bridging-Header.h */,
+				87FCCB64FDE7373D4B06F7CF /* Info.plist */,
+				D4A3290874E6684FE560CA97 /* Assets.xcassets */,
+				509F9AD6F363D527DCFD01DD /* Resources */,
+				86959BAC38CE7F658C5C4F10 /* Sources */,
+			);
+			name = BleSdkDemo;
+			sourceTree = "<group>";
+		};
+		D8342B555C7C0D7CE71C1189 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B92CD49F96805BB5F5B2F353 /* BleSdkDemo.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		E5E7D560CA1A32DE7B7F88DF /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				FFECA85B01CABB4C3655A565 /* iOS */,
+				BE8ECD6A805F604CDAF2F877 /* Pods_BleSdkDemo.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		FFECA85B01CABB4C3655A565 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				502C1CD344A9B5AA834FD48A /* Foundation.framework */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		AE0D6D9DD68F8FC90535B597 /* BleSdkDemo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FA0815B8684B580E313C21E5 /* Build configuration list for PBXNativeTarget "BleSdkDemo" */;
+			buildPhases = (
+				78A5845E68CEE3AE38FADD68 /* [CP] Check Pods Manifest.lock */,
+				174586E3473242F365C16F40 /* Sources */,
+				E0F1E080ECCFD997563841AE /* Frameworks */,
+				8BBC3694A672350C591BF0F8 /* Resources */,
+				65884EFB84E7AEBE98D526D4 /* [CP] Embed Pods Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = BleSdkDemo;
+			productName = BleSdkDemo;
+			productReference = B92CD49F96805BB5F5B2F353 /* BleSdkDemo.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		8EC1FE7AF2C82D8B20196B38 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					AE0D6D9DD68F8FC90535B597 = {
+						DevelopmentTeam = 66N5N482M5;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = C74BA7B619907CFB03E30485 /* Build configuration list for PBXProject "BleSdkDemo" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+				"zh-Hans",
+			);
+			mainGroup = A80D2BDC1A58F291CD3CF048;
+			productRefGroup = D8342B555C7C0D7CE71C1189 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				AE0D6D9DD68F8FC90535B597 /* BleSdkDemo */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		8BBC3694A672350C591BF0F8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6B93AC57E3937E4122FF9AEB /* Assets.xcassets in Resources */,
+				A4DD2DB75BFD6090F4F24888 /* Localizable.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		65884EFB84E7AEBE98D526D4 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-BleSdkDemo/Pods-BleSdkDemo-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/HwBluetoothSDK/HwBluetoothSDK.framework",
+				"${BUILT_PRODUCTS_DIR}/SSZipArchive/SSZipArchive.framework",
+				"${BUILT_PRODUCTS_DIR}/WatchfaceSDK/WatchfaceSDK.framework",
+				"${BUILT_PRODUCTS_DIR}/Zip/Zip.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/HwBluetoothSDK.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SSZipArchive.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/WatchfaceSDK.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Zip.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-BleSdkDemo/Pods-BleSdkDemo-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		78A5845E68CEE3AE38FADD68 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-BleSdkDemo-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		174586E3473242F365C16F40 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2ABB1804C393B97C83F072C5 /* AppDelegate.swift in Sources */,
+				AAE5C3D38B3D927A753D971D /* Models.swift in Sources */,
+				00E969A51CB6E42102A86C30 /* SceneDelegate.swift in Sources */,
+				D3FE14D92024E0D8021DE4A0 /* AgpsXywBuilder.swift in Sources */,
+				F09128AE8E68FF456D06F337 /* BleRepository.swift in Sources */,
+				0D0235AFA30893525BC31F47 /* BoundDeviceStore.swift in Sources */,
+				78CDE3DB7180C2C7D3A311C0 /* BindFlowViewController.swift in Sources */,
+				967F85E9ED40606E038B2AFE /* UIHelpers.swift in Sources */,
+				44010A3A4D82EB2AFC52A23F /* AgpsUpdateViewController.swift in Sources */,
+				A55959D7EDBC03437D883E7C /* AlbumTransferViewController.swift in Sources */,
+				61331A87A76AF27CCAE6BB3C /* FeatureViewControllers.swift in Sources */,
+				EBF773BDBEDA0F71E4A49AC3 /* MusicTransferViewController.swift in Sources */,
+				22C33A9279D5EA3A3CBD2212 /* HomeViewController.swift in Sources */,
+				FA1FC6D717D864F8AE1B028B /* ScanConnectViewController.swift in Sources */,
+				57AB498C14A031233E7137CE /* UnbindFlowViewController.swift in Sources */,
+				22A434D7817C3ABFCE164DA2 /* LocaleHelper.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		263E62A0F02F78926C2B2AD0 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				02A8DA414DFF28C5715D598F /* en */,
+				0E068E6BDBB8DB2E38460209 /* zh-Hans */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		3969A8946F2DBD2D6E7E9C91 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		7ED20EF83475BCE491BCC8B7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = C0750C526CA9AF7D8D9860FE /* Pods-BleSdkDemo.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 66N5N482M5;
+				ENABLE_BITCODE = NO;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = BleSdkDemo/Supporting/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-lz",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.huawo.blesdkdemo;
+				SDKROOT = iphoneos;
+				SWIFT_OBJC_BRIDGING_HEADER = "BleSdkDemo/Supporting/BleSdkDemo-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		7F9B05B42A39750D55559B83 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 268CE53F9A6695DAD2B6F851 /* Pods-BleSdkDemo.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 66N5N482M5;
+				ENABLE_BITCODE = NO;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = BleSdkDemo/Supporting/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-lz",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.huawo.blesdkdemo;
+				SDKROOT = iphoneos;
+				SWIFT_OBJC_BRIDGING_HEADER = "BleSdkDemo/Supporting/BleSdkDemo-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		88AE7B5A7FBE4FADACA000C3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		C74BA7B619907CFB03E30485 /* Build configuration list for PBXProject "BleSdkDemo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				88AE7B5A7FBE4FADACA000C3 /* Debug */,
+				3969A8946F2DBD2D6E7E9C91 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FA0815B8684B580E313C21E5 /* Build configuration list for PBXNativeTarget "BleSdkDemo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7ED20EF83475BCE491BCC8B7 /* Release */,
+				7F9B05B42A39750D55559B83 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 8EC1FE7AF2C82D8B20196B38 /* Project object */;
+}
