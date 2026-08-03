@@ -134,6 +134,10 @@ final class HomeViewController: UIViewController {
         let ota = UIHelpers.makeButton(""); ota.addTarget(self, action: #selector(tapOta), for: .touchUpInside)
         content.addArrangedSubview(makeRow([ag, ota]))
         actionButtons.append(contentsOf: [ag, ota])
+
+        let wf = UIHelpers.makeButton(""); wf.addTarget(self, action: #selector(tapWatchface), for: .touchUpInside)
+        content.addArrangedSubview(wf)
+        actionButtons.append(wf)
         _ = featureActions
     }
 
@@ -168,7 +172,8 @@ final class HomeViewController: UIViewController {
             L10n.tr("scan_connect"), L10n.tr("bind_watch"), L10n.tr("sync_data"),
             L10n.tr("unbind_watch"), L10n.tr("disconnect"),
             L10n.tr("goals"), L10n.tr("alarms"), L10n.tr("notify"),
-            L10n.tr("music"), L10n.tr("album"), L10n.tr("agps"), L10n.tr("ota")
+            L10n.tr("music"), L10n.tr("album"), L10n.tr("agps"), L10n.tr("ota"),
+            L10n.tr("watchface")
         ]
         for (i, t) in titles.enumerated() where i < actionButtons.count {
             actionButtons[i].setTitle(t, for: .normal)
@@ -260,13 +265,13 @@ final class HomeViewController: UIViewController {
         let canUnbind = !busy && bound
         let canFeature = !busy && hasDevice && (bound || phase == .connected)
 
-        guard actionButtons.count >= 12 else { return }
+        guard actionButtons.count >= 13 else { return }
         actionButtons[0].isEnabled = !busy
         actionButtons[1].isEnabled = canBind
         actionButtons[2].isEnabled = canSync
         actionButtons[3].isEnabled = canUnbind
         actionButtons[4].isEnabled = !busy && hasDevice
-        for i in 5..<12 { actionButtons[i].isEnabled = canFeature }
+        for i in 5..<13 { actionButtons[i].isEnabled = canFeature }
 
         if busy { statusSpinner.startAnimating() } else { statusSpinner.stopAnimating() }
     }
@@ -460,6 +465,10 @@ final class HomeViewController: UIViewController {
     @objc private func tapOta() {
         guard requireConnectedFeature() else { return }
         navigationController?.pushViewController(OtaUpgradeViewController(), animated: true)
+    }
+    @objc private func tapWatchface() {
+        guard requireConnectedFeature() else { return }
+        navigationController?.pushViewController(WatchfaceHostViewController(), animated: true)
     }
 }
 

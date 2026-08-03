@@ -1,0 +1,1 @@
+/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwActive.h

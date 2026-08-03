@@ -8,28 +8,35 @@
 
 /* Begin PBXBuildFile section */
 		00E969A51CB6E42102A86C30 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E507F2715CCBFC3539CF51B0 /* SceneDelegate.swift */; };
-		C4D261ED8D0B06BD6B09FF47 /* OtaModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AF4D348D92923C24D180513 /* OtaModels.swift */; };
-		F12485D8B37EA548E71A0DA0 /* FirmwareVersionUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 138C97AD05BE1C7CF0DC1A51 /* FirmwareVersionUtils.swift */; };
-		6126B03BDE753C63C1475BD9 /* OtaFirmwareApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = D60674E7BC247DD7B39B41FD /* OtaFirmwareApi.swift */; };
-		255E38BE21C4B69BBA9FF1CA /* SifliOtaPusher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E717FEEB44E3BA3EE0B389B /* SifliOtaPusher.swift */; };
-		7D77EF66DE5F7F21F446F9D4 /* OtaUpgradeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B91DA5AF632A0141068D36C7 /* OtaUpgradeViewController.swift */; };
 		0D0235AFA30893525BC31F47 /* BoundDeviceStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87533339C8C8D14D102294FB /* BoundDeviceStore.swift */; };
+		1C840E956D3B4D0D90A29D75 /* AiWatchfaceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC7FD9CDB3E24795B0A48F3C /* AiWatchfaceViewController.swift */; };
 		22A434D7817C3ABFCE164DA2 /* LocaleHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D641DF46CA811EC15937CA3B /* LocaleHelper.swift */; };
 		22C33A9279D5EA3A3CBD2212 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF973DBBA57A72AE5FA132E6 /* HomeViewController.swift */; };
+		255E38BE21C4B69BBA9FF1CA /* SifliOtaPusher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E717FEEB44E3BA3EE0B389B /* SifliOtaPusher.swift */; };
 		2ABB1804C393B97C83F072C5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD34F1A20A84C7AACA9F5217 /* AppDelegate.swift */; };
+		2C076A8A599942B99A769B92 /* OnlineWatchfaceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49B7674D8BD54992BE75ACA4 /* OnlineWatchfaceViewController.swift */; };
+		3483115E8E30437A8671904E /* WatchfaceHostViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1959C6454D524B7E8A7DAC01 /* WatchfaceHostViewController.swift */; };
+		35566BA2277944D6B6A64CD9 /* WatchfaceImageUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0038507F7E74BF8AB4D6903 /* WatchfaceImageUtils.swift */; };
+		38428380DDDE4BC981DFE60F /* CustomWatchfaceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BF165DFAB649DF9A615D26 /* CustomWatchfaceViewController.swift */; };
 		4043D3E7EAE75DFCBFC01948 /* Pods_BleSdkDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BE8ECD6A805F604CDAF2F877 /* Pods_BleSdkDemo.framework */; };
 		44010A3A4D82EB2AFC52A23F /* AgpsUpdateViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F289D7F6270E8765A9AC88D /* AgpsUpdateViewController.swift */; };
 		57AB498C14A031233E7137CE /* UnbindFlowViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6579266C6513A7C238F54CFD /* UnbindFlowViewController.swift */; };
+		6126B03BDE753C63C1475BD9 /* OtaFirmwareApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = D60674E7BC247DD7B39B41FD /* OtaFirmwareApi.swift */; };
 		61331A87A76AF27CCAE6BB3C /* FeatureViewControllers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EB3FAFDA08BFDBE6F331860 /* FeatureViewControllers.swift */; };
 		6B93AC57E3937E4122FF9AEB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D4A3290874E6684FE560CA97 /* Assets.xcassets */; };
 		78CDE3DB7180C2C7D3A311C0 /* BindFlowViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5D8C7D3541C7418C8C259A3 /* BindFlowViewController.swift */; };
+		7D77EF66DE5F7F21F446F9D4 /* OtaUpgradeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B91DA5AF632A0141068D36C7 /* OtaUpgradeViewController.swift */; };
+		957139218A9A455C8CF78629 /* WatchfaceApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32589A67000F44F0884DA9DF /* WatchfaceApi.swift */; };
 		967F85E9ED40606E038B2AFE /* UIHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF4B2DF9A98E169FCD7FCF4A /* UIHelpers.swift */; };
 		A4DD2DB75BFD6090F4F24888 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 263E62A0F02F78926C2B2AD0 /* Localizable.strings */; };
 		A55959D7EDBC03437D883E7C /* AlbumTransferViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2350CCE1DD1241DA119C437D /* AlbumTransferViewController.swift */; };
 		AAE5C3D38B3D927A753D971D /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3265F80EF513B9C44DAA853D /* Models.swift */; };
+		C4D261ED8D0B06BD6B09FF47 /* OtaModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AF4D348D92923C24D180513 /* OtaModels.swift */; };
 		D3FE14D92024E0D8021DE4A0 /* AgpsXywBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7866CD6110555D10C1B45FC7 /* AgpsXywBuilder.swift */; };
 		EBF773BDBEDA0F71E4A49AC3 /* MusicTransferViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02A439A6EEAD381A87B7EC56 /* MusicTransferViewController.swift */; };
 		F09128AE8E68FF456D06F337 /* BleRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CE3ACBC85F1464CFBD24481 /* BleRepository.swift */; };
+		F12485D8B37EA548E71A0DA0 /* FirmwareVersionUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 138C97AD05BE1C7CF0DC1A51 /* FirmwareVersionUtils.swift */; };
+		F9C185A8A6504072B4653A7B /* WatchfaceModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2B0346CC9C44E03A8C6153C /* WatchfaceModels.swift */; };
 		FA1FC6D717D864F8AE1B028B /* ScanConnectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282A2946747604440754D4FC /* ScanConnectViewController.swift */; };
 		FEEA3A09CC63A1BDAA031D6A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 502C1CD344A9B5AA834FD48A /* Foundation.framework */; };
 /* End PBXBuildFile section */
@@ -38,17 +45,18 @@
 		02A439A6EEAD381A87B7EC56 /* MusicTransferViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MusicTransferViewController.swift; path = BleSdkDemo/Sources/UI/Features/MusicTransferViewController.swift; sourceTree = "<group>"; };
 		02A8DA414DFF28C5715D598F /* en */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		0E068E6BDBB8DB2E38460209 /* zh-Hans */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
-		1F289D7F6270E8765A9AC88D /* AgpsUpdateViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AgpsUpdateViewController.swift; path = BleSdkDemo/Sources/UI/Features/AgpsUpdateViewController.swift; sourceTree = "<group>"; };
-		8AF4D348D92923C24D180513 /* OtaModels.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OtaModels.swift; path = BleSdkDemo/Sources/Models/OtaModels.swift; sourceTree = "<group>"; };
 		138C97AD05BE1C7CF0DC1A51 /* FirmwareVersionUtils.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FirmwareVersionUtils.swift; path = BleSdkDemo/Sources/Services/Ota/FirmwareVersionUtils.swift; sourceTree = "<group>"; };
-		D60674E7BC247DD7B39B41FD /* OtaFirmwareApi.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OtaFirmwareApi.swift; path = BleSdkDemo/Sources/Services/Ota/OtaFirmwareApi.swift; sourceTree = "<group>"; };
-		4E717FEEB44E3BA3EE0B389B /* SifliOtaPusher.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SifliOtaPusher.swift; path = BleSdkDemo/Sources/Services/Ota/SifliOtaPusher.swift; sourceTree = "<group>"; };
-		B91DA5AF632A0141068D36C7 /* OtaUpgradeViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OtaUpgradeViewController.swift; path = BleSdkDemo/Sources/UI/Features/OtaUpgradeViewController.swift; sourceTree = "<group>"; };
+		1959C6454D524B7E8A7DAC01 /* WatchfaceHostViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WatchfaceHostViewController.swift; path = BleSdkDemo/Sources/UI/Watchface/WatchfaceHostViewController.swift; sourceTree = "<group>"; };
+		1F289D7F6270E8765A9AC88D /* AgpsUpdateViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AgpsUpdateViewController.swift; path = BleSdkDemo/Sources/UI/Features/AgpsUpdateViewController.swift; sourceTree = "<group>"; };
 		2350CCE1DD1241DA119C437D /* AlbumTransferViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AlbumTransferViewController.swift; path = BleSdkDemo/Sources/UI/Features/AlbumTransferViewController.swift; sourceTree = "<group>"; };
 		268CE53F9A6695DAD2B6F851 /* Pods-BleSdkDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BleSdkDemo.debug.xcconfig"; path = "Target Support Files/Pods-BleSdkDemo/Pods-BleSdkDemo.debug.xcconfig"; sourceTree = "<group>"; };
 		282A2946747604440754D4FC /* ScanConnectViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ScanConnectViewController.swift; path = BleSdkDemo/Sources/UI/Scan/ScanConnectViewController.swift; sourceTree = "<group>"; };
 		2CE3ACBC85F1464CFBD24481 /* BleRepository.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BleRepository.swift; path = BleSdkDemo/Sources/Services/BleRepository.swift; sourceTree = "<group>"; };
+		32589A67000F44F0884DA9DF /* WatchfaceApi.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WatchfaceApi.swift; path = BleSdkDemo/Sources/Services/Watchface/WatchfaceApi.swift; sourceTree = "<group>"; };
 		3265F80EF513B9C44DAA853D /* Models.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Models.swift; path = BleSdkDemo/Sources/Models/Models.swift; sourceTree = "<group>"; };
+		37BF165DFAB649DF9A615D26 /* CustomWatchfaceViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CustomWatchfaceViewController.swift; path = BleSdkDemo/Sources/UI/Watchface/CustomWatchfaceViewController.swift; sourceTree = "<group>"; };
+		49B7674D8BD54992BE75ACA4 /* OnlineWatchfaceViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OnlineWatchfaceViewController.swift; path = BleSdkDemo/Sources/UI/Watchface/OnlineWatchfaceViewController.swift; sourceTree = "<group>"; };
+		4E717FEEB44E3BA3EE0B389B /* SifliOtaPusher.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SifliOtaPusher.swift; path = BleSdkDemo/Sources/Services/Ota/SifliOtaPusher.swift; sourceTree = "<group>"; };
 		502C1CD344A9B5AA834FD48A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		54B5306B5EFC774661A5DB60 /* BleSdkDemo-Bridging-Header.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "BleSdkDemo-Bridging-Header.h"; path = "BleSdkDemo/Supporting/BleSdkDemo-Bridging-Header.h"; sourceTree = "<group>"; };
 		6579266C6513A7C238F54CFD /* UnbindFlowViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = UnbindFlowViewController.swift; path = BleSdkDemo/Sources/UI/Unbind/UnbindFlowViewController.swift; sourceTree = "<group>"; };
@@ -56,16 +64,22 @@
 		7866CD6110555D10C1B45FC7 /* AgpsXywBuilder.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AgpsXywBuilder.swift; path = BleSdkDemo/Sources/Services/AgpsXywBuilder.swift; sourceTree = "<group>"; };
 		87533339C8C8D14D102294FB /* BoundDeviceStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BoundDeviceStore.swift; path = BleSdkDemo/Sources/Services/BoundDeviceStore.swift; sourceTree = "<group>"; };
 		87FCCB64FDE7373D4B06F7CF /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; name = Info.plist; path = BleSdkDemo/Supporting/Info.plist; sourceTree = "<group>"; };
+		8AF4D348D92923C24D180513 /* OtaModels.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OtaModels.swift; path = BleSdkDemo/Sources/Models/OtaModels.swift; sourceTree = "<group>"; };
 		A5D8C7D3541C7418C8C259A3 /* BindFlowViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BindFlowViewController.swift; path = BleSdkDemo/Sources/UI/Bind/BindFlowViewController.swift; sourceTree = "<group>"; };
+		B2B0346CC9C44E03A8C6153C /* WatchfaceModels.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WatchfaceModels.swift; path = BleSdkDemo/Sources/Models/WatchfaceModels.swift; sourceTree = "<group>"; };
+		B91DA5AF632A0141068D36C7 /* OtaUpgradeViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OtaUpgradeViewController.swift; path = BleSdkDemo/Sources/UI/Features/OtaUpgradeViewController.swift; sourceTree = "<group>"; };
 		B92CD49F96805BB5F5B2F353 /* BleSdkDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BleSdkDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BD34F1A20A84C7AACA9F5217 /* AppDelegate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = BleSdkDemo/Sources/AppDelegate.swift; sourceTree = "<group>"; };
 		BE8ECD6A805F604CDAF2F877 /* Pods_BleSdkDemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BleSdkDemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C0750C526CA9AF7D8D9860FE /* Pods-BleSdkDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BleSdkDemo.release.xcconfig"; path = "Target Support Files/Pods-BleSdkDemo/Pods-BleSdkDemo.release.xcconfig"; sourceTree = "<group>"; };
+		CC7FD9CDB3E24795B0A48F3C /* AiWatchfaceViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AiWatchfaceViewController.swift; path = BleSdkDemo/Sources/UI/Watchface/AiWatchfaceViewController.swift; sourceTree = "<group>"; };
 		CF4B2DF9A98E169FCD7FCF4A /* UIHelpers.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = UIHelpers.swift; path = BleSdkDemo/Sources/UI/Common/UIHelpers.swift; sourceTree = "<group>"; };
 		CF973DBBA57A72AE5FA132E6 /* HomeViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = HomeViewController.swift; path = BleSdkDemo/Sources/UI/Home/HomeViewController.swift; sourceTree = "<group>"; };
 		D4A3290874E6684FE560CA97 /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = BleSdkDemo/Resources/Assets.xcassets; sourceTree = "<group>"; };
+		D60674E7BC247DD7B39B41FD /* OtaFirmwareApi.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OtaFirmwareApi.swift; path = BleSdkDemo/Sources/Services/Ota/OtaFirmwareApi.swift; sourceTree = "<group>"; };
 		D641DF46CA811EC15937CA3B /* LocaleHelper.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LocaleHelper.swift; path = BleSdkDemo/Sources/Services/LocaleHelper.swift; sourceTree = "<group>"; };
 		E507F2715CCBFC3539CF51B0 /* SceneDelegate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SceneDelegate.swift; path = BleSdkDemo/Sources/SceneDelegate.swift; sourceTree = "<group>"; };
+		F0038507F7E74BF8AB4D6903 /* WatchfaceImageUtils.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WatchfaceImageUtils.swift; path = BleSdkDemo/Sources/Services/Watchface/WatchfaceImageUtils.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -138,6 +152,13 @@
 				CF4B2DF9A98E169FCD7FCF4A /* UIHelpers.swift */,
 				1F289D7F6270E8765A9AC88D /* AgpsUpdateViewController.swift */,
 				8AF4D348D92923C24D180513 /* OtaModels.swift */,
+				B2B0346CC9C44E03A8C6153C /* WatchfaceModels.swift */,
+				32589A67000F44F0884DA9DF /* WatchfaceApi.swift */,
+				F0038507F7E74BF8AB4D6903 /* WatchfaceImageUtils.swift */,
+				1959C6454D524B7E8A7DAC01 /* WatchfaceHostViewController.swift */,
+				49B7674D8BD54992BE75ACA4 /* OnlineWatchfaceViewController.swift */,
+				37BF165DFAB649DF9A615D26 /* CustomWatchfaceViewController.swift */,
+				CC7FD9CDB3E24795B0A48F3C /* AiWatchfaceViewController.swift */,
 				138C97AD05BE1C7CF0DC1A51 /* FirmwareVersionUtils.swift */,
 				D60674E7BC247DD7B39B41FD /* OtaFirmwareApi.swift */,
 				4E717FEEB44E3BA3EE0B389B /* SifliOtaPusher.swift */,
@@ -194,6 +215,7 @@
 				E0F1E080ECCFD997563841AE /* Frameworks */,
 				8BBC3694A672350C591BF0F8 /* Resources */,
 				65884EFB84E7AEBE98D526D4 /* [CP] Embed Pods Frameworks */,
+				37283E587B4191DE026AB1C6 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -251,6 +273,192 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		37283E587B4191DE026AB1C6 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-BleSdkDemo/Pods-BleSdkDemo-resources.sh",
+				"${PODS_CONFIGURATION_BUILD_DIR}/AiSDK/AiSDK.bundle",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/data_num_2103.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/data_num_2109.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/data_num_25.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/data_num_2d.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/data_num_2e.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/data_num_30.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/data_num_31.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/data_num_32.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/data_num_33.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/data_num_34.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/data_num_35.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/data_num_36.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/data_num_37.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/data_num_38.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/data_num_39.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/date_num_30.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/date_num_31.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/date_num_32.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/date_num_33.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/date_num_34.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/date_num_35.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/date_num_36.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/date_num_37.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/date_num_38.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/date_num_39.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/icon_battery.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/icon_distance.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/icon_heart.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/icon_heart_bpm.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/icon_kcal.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/icon_steps.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/icon_time.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/icon_video_cimg@2x.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/icon_video_cimg@3x.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/icon_weather.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/icon_wer_01.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/icon_wer_02.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/icon_wer_03.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/icon_wer_04.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/icon_wer_05.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/icon_wer_06.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/icon_wer_07.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/icon_wer_08.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/icon_wer_09.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/icon_wer_10.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/icon_wer_11.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/icon_wer_12.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/icon_wer_13.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/icon_wer_14.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/icon_wer_15.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/mid_bar.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/pointer_center.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/pointer_hour.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/pointer_min.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/pointer_second.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/time_b_25.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/time_b_30.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/time_b_31.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/time_b_32.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/time_b_33.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/time_b_34.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/time_b_35.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/time_b_36.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/time_b_37.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/time_b_38.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/time_b_39.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/time_s_25.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/time_s_30.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/time_s_31.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/time_s_32.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/time_s_33.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/time_s_34.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/time_s_35.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/time_s_36.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/time_s_37.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/time_s_38.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/time_s_39.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/week_00.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/week_01.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/week_02.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/week_03.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/week_04.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/week_05.png",
+				"${PODS_ROOT}/../Vendor/WatchfaceSDK/WatchfaceSDK/Assets/week_06.png",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/AiSDK.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/data_num_2103.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/data_num_2109.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/data_num_25.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/data_num_2d.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/data_num_2e.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/data_num_30.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/data_num_31.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/data_num_32.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/data_num_33.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/data_num_34.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/data_num_35.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/data_num_36.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/data_num_37.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/data_num_38.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/data_num_39.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/date_num_30.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/date_num_31.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/date_num_32.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/date_num_33.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/date_num_34.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/date_num_35.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/date_num_36.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/date_num_37.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/date_num_38.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/date_num_39.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/icon_battery.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/icon_distance.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/icon_heart.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/icon_heart_bpm.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/icon_kcal.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/icon_steps.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/icon_time.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/icon_video_cimg@2x.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/icon_video_cimg@3x.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/icon_weather.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/icon_wer_01.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/icon_wer_02.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/icon_wer_03.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/icon_wer_04.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/icon_wer_05.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/icon_wer_06.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/icon_wer_07.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/icon_wer_08.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/icon_wer_09.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/icon_wer_10.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/icon_wer_11.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/icon_wer_12.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/icon_wer_13.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/icon_wer_14.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/icon_wer_15.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/mid_bar.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/pointer_center.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/pointer_hour.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/pointer_min.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/pointer_second.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/time_b_25.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/time_b_30.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/time_b_31.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/time_b_32.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/time_b_33.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/time_b_34.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/time_b_35.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/time_b_36.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/time_b_37.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/time_b_38.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/time_b_39.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/time_s_25.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/time_s_30.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/time_s_31.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/time_s_32.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/time_s_33.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/time_s_34.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/time_s_35.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/time_s_36.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/time_s_37.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/time_s_38.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/time_s_39.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/week_00.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/week_01.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/week_02.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/week_03.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/week_04.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/week_05.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/week_06.png",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-BleSdkDemo/Pods-BleSdkDemo-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		65884EFB84E7AEBE98D526D4 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -258,17 +466,11 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-BleSdkDemo/Pods-BleSdkDemo-frameworks.sh",
-				"${BUILT_PRODUCTS_DIR}/HwBluetoothSDK/HwBluetoothSDK.framework",
-				"${BUILT_PRODUCTS_DIR}/SSZipArchive/SSZipArchive.framework",
-				"${BUILT_PRODUCTS_DIR}/WatchfaceSDK/WatchfaceSDK.framework",
-				"${BUILT_PRODUCTS_DIR}/Zip/Zip.framework",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/AiSDK/JLBmpConvertKit.framework/JLBmpConvertKit",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/HwBluetoothSDK.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SSZipArchive.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/WatchfaceSDK.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Zip.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/JLBmpConvertKit.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -304,6 +506,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1C840E956D3B4D0D90A29D75 /* AiWatchfaceViewController.swift in Sources */,
+				38428380DDDE4BC981DFE60F /* CustomWatchfaceViewController.swift in Sources */,
+				2C076A8A599942B99A769B92 /* OnlineWatchfaceViewController.swift in Sources */,
+				3483115E8E30437A8671904E /* WatchfaceHostViewController.swift in Sources */,
+				35566BA2277944D6B6A64CD9 /* WatchfaceImageUtils.swift in Sources */,
+				957139218A9A455C8CF78629 /* WatchfaceApi.swift in Sources */,
+				F9C185A8A6504072B4653A7B /* WatchfaceModels.swift in Sources */,
 				2ABB1804C393B97C83F072C5 /* AppDelegate.swift in Sources */,
 				AAE5C3D38B3D927A753D971D /* Models.swift in Sources */,
 				00E969A51CB6E42102A86C30 /* SceneDelegate.swift in Sources */,

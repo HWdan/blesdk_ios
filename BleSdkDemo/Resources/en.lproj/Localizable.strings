@@ -285,6 +285,58 @@
 "ota_err_diff_resource" = "Diff OTA requires resource name/url/md5";
 "ota_err_no_ctrl" = "Zip missing ctrl / diff_ctrl";
 
+/* Watchface */
+"watchface" = "Watchface";
+"wf_tab_custom" = "Custom";
+"wf_tab_online" = "Online";
+"wf_tab_ai" = "AI";
+"wf_refresh_list" = "Refresh list";
+"wf_loading" = "Loading watchfaces…";
+"wf_list_count" = "%d items (type=%@)";
+"wf_install" = "Install";
+"wf_installing" = "Installing %@…";
+"wf_install_start" = "Install %@";
+"wf_install_ok" = "Watchface installed";
+"wf_install_fail" = "Watchface install failed";
+"wf_phase_checking" = "Checking installed faces…";
+"wf_phase_switching" = "Switching watchface…";
+"wf_phase_downloading" = "Downloading package…";
+"wf_size_kb" = "%lld KB";
+"wf_err_no_type" = "deviceType empty; connect & refresh device info";
+"wf_err_no_bin" = "Package bin path missing";
+"wf_err_size" = "Invalid width/height";
+"wf_size_preset" = "Size preset";
+"wf_pick_bg" = "Pick background";
+"wf_clear_bg" = "Clear background";
+"wf_push_custom" = "Push custom watchface";
+"wf_push_custom_start" = "Push %@ %dx%d";
+"wf_pushing" = "Pushing…";
+"wf_progress" = "Progress %d%%";
+"wf_zip_ok" = "Zip ready";
+"wf_zip_fail" = "Zip failed";
+"wf_name" = "Name";
+"wf_widget_date" = "Date";
+"wf_widget_week" = "Week";
+"wf_widget_step" = "Step";
+"wf_widget_weather" = "Weather";
+"wf_widget_pointer" = "Analog pointers";
+"wf_ai_hint" = "Start AI, apply size, then generate on the watch";
+"wf_ai_start" = "Start AiSDK";
+"wf_ai_stop" = "Stop AiSDK";
+"wf_ai_apply" = "Apply device info";
+"wf_ai_started" = "AiSDK started — open AI dial on watch";
+"wf_ai_stopped" = "AiSDK stopped";
+"wf_ai_ready_on_watch" = "Ready: use AI watchface on the device";
+"wf_ai_applied" = "Applied size %dx%d";
+"wf_ai_device_id" = "Device ID: %@";
+"wf_ai_style_anime" = "Anime style";
+"wf_ai_style_pencil" = "Pencil style";
+"wf_ai_result" = "AI result image";
+"wf_ai_preview" = "Preview image";
+"wf_ai_image_ok" = "AI image ready";
+"wf_ai_preview_ok" = "Preview ready";
+"wf_ai_installing" = "Installing AI watchface…";
+
 /* Errors */
 "err_transfer_busy" = "A transfer is in progress. Cancel or wait.";
 "err_no_music" = "No valid music files";

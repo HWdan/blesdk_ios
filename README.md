@@ -38,7 +38,9 @@ Exclusive file transfers (music, album, AGPS, OTA) share one lock so concurrent 
 | Pod | Path | Purpose |
 |-----|------|---------|
 | `HwBluetoothSDK` | `../bluetooth-sdk-oc` | Scan, connect, bind, health, goals, alarms, notify, contacts |
-| `WatchfaceSDK` | `Vendor/WatchfaceSDK` | Sifli music / album / AGPS push (`SifliWatchfaceSDK`) + OTA (`SifliOTAManagerSDK`) |
+| `WatchfaceSDK` | `Vendor/WatchfaceSDK` | Sifli music / album / AGPS / watchface push + OTA frameworks |
+| `AiSDK` | `Vendor/AiSDK` | AI watchface pipeline (AFlash + Sifli install); headers reconstructed for builds without Esafenet |
+| `AFNetworking` | CocoaPods | AiSDK HTTP dependency |
 | `Zip` | `Vendor/Zip` | Zip packaging helpers |
 | `SSZipArchive` | `Vendor/SSZipArchive` | Unzip firmware / packages |
 
@@ -148,6 +150,18 @@ For full packages, `resourcePath` is omitted (`nil`). An empty `file://` URL mus
 
 JL / Realtek OTA paths are not implemented in this demo.
 
+### Watchface (Sifli)
+
+Screen: `WatchfaceHostViewController` with three tabs.
+
+| Tab | Behavior |
+|-----|----------|
+| **Online** | `GET …/api/v1/products/{deviceType}/watchfaces` → install: check installed names → switch if match, else download+MD5 → `setOnlineWatchface` (`type=5`, `byteAlign=false`) |
+| **Custom** | Build `SlifiCustomWatchface` (bg / thumbnail / Time+widgets) → `setCustomWatchface` |
+| **AI** | `AiSDK` lifecycle (`startWorking` + `AiDeviceInfo`); generation runs on the watch; App shows result/preview/install progress |
+
+During install, back navigation and tab switching are locked.
+
 ---
 
 ## Localization
@@ -192,6 +206,8 @@ sdkdemo/
 │   ├── Resources/                  # en / zh-Hans strings
 │   └── Supporting/                 # Info.plist, bridging header
 ├── Vendor/
+│   ├── AiSDK/                      # AI watchface SDK (+ reconstructed headers)
+│   ├── AiSDKHeaders/               # Plaintext header overlays (reference)
 │   ├── WatchfaceSDK/
 │   ├── Zip/
 │   └── SSZipArchive/

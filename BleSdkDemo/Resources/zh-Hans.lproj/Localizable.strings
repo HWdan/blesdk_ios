@@ -285,6 +285,58 @@
 "ota_err_diff_resource" = "差分 OTA 需要 resource name/url/md5";
 "ota_err_no_ctrl" = "Zip 缺少 ctrl / diff_ctrl";
 
+/* Watchface */
+"watchface" = "表盘";
+"wf_tab_custom" = "自定义";
+"wf_tab_online" = "在线";
+"wf_tab_ai" = "AI";
+"wf_refresh_list" = "刷新列表";
+"wf_loading" = "加载表盘列表…";
+"wf_list_count" = "%d 个（type=%@）";
+"wf_install" = "安装";
+"wf_installing" = "正在安装 %@…";
+"wf_install_start" = "安装 %@";
+"wf_install_ok" = "表盘安装成功";
+"wf_install_fail" = "表盘安装失败";
+"wf_phase_checking" = "检查已安装表盘…";
+"wf_phase_switching" = "切换表盘…";
+"wf_phase_downloading" = "下载表盘包…";
+"wf_size_kb" = "%lld KB";
+"wf_err_no_type" = "deviceType 为空，请先连接并刷新设备信息";
+"wf_err_no_bin" = "缺少表盘 bin 路径";
+"wf_err_size" = "宽高无效";
+"wf_size_preset" = "尺寸预设";
+"wf_pick_bg" = "选择背景";
+"wf_clear_bg" = "清除背景";
+"wf_push_custom" = "推送自定义表盘";
+"wf_push_custom_start" = "推送 %@ %dx%d";
+"wf_pushing" = "推送中…";
+"wf_progress" = "进度 %d%%";
+"wf_zip_ok" = "打包完成";
+"wf_zip_fail" = "打包失败";
+"wf_name" = "名称";
+"wf_widget_date" = "日期";
+"wf_widget_week" = "星期";
+"wf_widget_step" = "步数";
+"wf_widget_weather" = "天气";
+"wf_widget_pointer" = "指针";
+"wf_ai_hint" = "启动 AI 并设置尺寸后，在手表端进入 AI 表盘生成";
+"wf_ai_start" = "启动 AiSDK";
+"wf_ai_stop" = "停止 AiSDK";
+"wf_ai_apply" = "应用设备信息";
+"wf_ai_started" = "AiSDK 已启动，请在手表上打开 AI 表盘";
+"wf_ai_stopped" = "AiSDK 已停止";
+"wf_ai_ready_on_watch" = "就绪：请在手表上使用 AI 表盘";
+"wf_ai_applied" = "已应用尺寸 %dx%d";
+"wf_ai_device_id" = "设备 ID: %@";
+"wf_ai_style_anime" = "动漫风格";
+"wf_ai_style_pencil" = "铅笔画风格";
+"wf_ai_result" = "AI 结果图";
+"wf_ai_preview" = "预览图";
+"wf_ai_image_ok" = "AI 图片已生成";
+"wf_ai_preview_ok" = "预览已就绪";
+"wf_ai_installing" = "正在安装 AI 表盘…";
+
 /* Errors */
 "err_transfer_busy" = "有传输任务进行中，请先取消或等待完成";
 "err_no_music" = "无有效音乐文件";

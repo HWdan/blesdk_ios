@@ -21,6 +21,7 @@ Pod::Spec.new do |s|
     'WatchfaceSDK/VideoWatchfaceSDK.framework'
   ]
   s.frameworks = 'AudioToolbox', 'CoreMedia', 'VideoToolbox', 'AVFoundation'
+  s.libraries = 'bz2', 'z', 'c++'
   s.dependency 'Zip', '~> 2.1'
   s.dependency 'SSZipArchive'
 end

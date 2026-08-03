@@ -65,7 +65,9 @@ final class BleRepository {
     private var activeTransferKind: TransferKind?
 
     /// High-level categories of exclusive file-transfer / DFU operations.
-    enum TransferKind { case music, album, agps, ota }
+    /// Exclusive Sifli file-transfer kinds sharing one BLE lock (`beginTransfer`).
+    /// `.watchface` covers online ZIP push and custom dial push (not AiSDK-owned AI send).
+    enum TransferKind { case music, album, agps, ota, watchface }
 
     private init() {}
 
@@ -892,9 +894,11 @@ final class BleRepository {
     // MARK: - Music / Album / AGPS
     //
     // Exclusive Sifli file transfers share one lock (`beginTransfer` / `endTransfer` /
-    // `cancelTransfer`). Concurrent music, album, or AGPS pushes are rejected with
-    // `err_transfer_busy`. iOS demo paths always use SifliWatchfaceSDK; JL (classic BT)
-    // helpers remain for parity / debugging only.
+    // `cancelTransfer`). Concurrent music, album, AGPS, OTA, or watchface pushes are
+    // rejected with `err_transfer_busy`. iOS demo paths always use SifliWatchfaceSDK;
+    // JL (classic BT) helpers remain for parity / debugging only.
+    // Note: AI dial install is driven by AiSDK and does not call beginTransfer(.watchface);
+    // the Watchface host still locks UI navigation while AiSDK reports send progress.
     //
     // Music zip layout:  …/selectTemp/music/mp3/*.mp3  →  zip entries music/mp3/*
     // Album:             resize/crop → allocate slots 1...50 → setPictures
@@ -985,7 +989,7 @@ final class BleRepository {
         switch activeTransferKind {
         case .ota:
             SifliOtaPusher.shared.stop()
-        case .music, .album, .agps:
+        case .music, .album, .agps, .watchface:
             SifliWatchfaceSDK.getInstance().stop()
         case .none:
             SifliWatchfaceSDK.getInstance().stop()
@@ -1448,6 +1452,252 @@ final class BleRepository {
             } catch {
                 DispatchQueue.main.async {
                     self.endTransfer()
+                    completion(.failure(error))
+                }
+            }
+        }
+    }
+
+    // MARK: - Watchface (Sifli online / custom)
+    //
+    // Three demo surfaces share this section:
+    //   • Online  — catalog ZIP → setOnlineWatchface (dial type 5, byteAlign false)
+    //   • Custom  — SlifiCustomWatchface widgets → setCustomWatchface (SDK zips then pushes)
+    //   • AI      — AiSDK drives preview/install; App only supplies AiDeviceInfo + observes callbacks
+    //
+    // Transfer lock: online/custom acquire `.watchface` so they never overlap music/album/AGPS/OTA.
+    // AI install runs inside AiSDK (it calls SifliWatchfaceSDK itself); the UI locks navigation
+    // via WatchfaceHostViewController.setInstalling while AiSDK reports progress.
+    //
+    // This demo is **Sifli-only** for watchfaces (no JL online/custom path in the UI).
+
+    /// Installed Sifli watchface **names** currently stored on the watch.
+    /// Used by online install to decide "switch only" vs "download + push".
+    func getSifliInstalledWatchfaceNames(completion: @escaping (Result<[String], Error>) -> Void) {
+        sdk.getSifliInstalledWatchfaceNames { list, error in
+            DispatchQueue.main.async {
+                if let error = error { completion(.failure(error)) }
+                else { completion(.success((list as? [String]) ?? [])) }
+            }
+        }
+    }
+
+    /// Activates an already-installed Sifli face by **name** (no ZIP transfer).
+    /// Prefer this when `getSifliInstalledWatchfaceNames` already contains a matching name.
+    func switchSifliWatchface(name: String, completion: @escaping (Result<Void, Error>) -> Void) {
+        sdk.setSifliDisplayingWatchfaceName(name) { ok, error in
+            DispatchQueue.main.async {
+                Self.boolResult(ok, error, completion)
+            }
+        }
+    }
+
+    /// Reads the name of the watchface currently shown on a Sifli device.
+    func getSifliDisplayingWatchfaceName(completion: @escaping (Result<String, Error>) -> Void) {
+        sdk.getSifliDisplayingWatchfaceName { value, error in
+            DispatchQueue.main.async {
+                if let error = error { completion(.failure(error)) }
+                else { completion(.success(value ?? "")) }
+            }
+        }
+    }
+
+    /// Reads the device id required by AiSDK / AFlash (`AiDeviceInfo.Id`).
+    func getDeviceId(completion: @escaping (Result<String, Error>) -> Void) {
+        sdk.getDeviceId { value, error in
+            DispatchQueue.main.async {
+                if let error = error { completion(.failure(error)) }
+                else { completion(.success(value ?? "")) }
+            }
+        }
+    }
+
+    /// Pushes a server-downloaded online dial ZIP.
+    ///
+    /// Uses `SifliWatchfaceSDK.setOnlineWatchface`, which internally calls
+    /// `SFDialPlateManager.pushDialPlate(..., type: 5, withByteAlign: false)`.
+    /// Do **not** use `byteAlign: true` for online packages (that flag is for music/album/AGPS).
+    ///
+    /// Progress callback is normalized to `0...1` (SDK reports 0...100 integers).
+    /// Acquires the exclusive `.watchface` transfer lock.
+    func pushOnlineWatchfaceZip(zipURL: URL,
+                                onProgress: @escaping (Float) -> Void,
+                                completion: @escaping (Result<Void, Error>) -> Void) {
+        if let err = beginTransfer(.watchface) { completion(.failure(err)); return }
+        guard let uuid = connectedUUID() else {
+            endTransfer()
+            completion(.failure(SdkError(code: -5, message: "no connected uuid")))
+            return
+        }
+        guard FileManager.default.fileExists(atPath: zipURL.path) else {
+            endTransfer()
+            completion(.failure(SdkError(code: -3, message: "zip missing")))
+            return
+        }
+        SifliWatchfaceSDK.getInstance().setOnlineWatchface(
+            devIdentifier: uuid,
+            filePath: zipURL,
+            progressCallback: { p in
+                // SDK reports 0...100 integers.
+                DispatchQueue.main.async { onProgress(Float(p) / 100.0) }
+            },
+            finishCallback: { [weak self] ok, errInfo, errType, _ in
+                DispatchQueue.main.async {
+                    self?.endTransfer()
+                    if ok { completion(.success(())) }
+                    else {
+                        completion(.failure(SdkError(
+                            code: Int(errType),
+                            message: errInfo ?? "online watchface fail"
+                        )))
+                    }
+                }
+            }
+        )
+    }
+
+    /// Packages and pushes a custom dial built by the UI.
+    ///
+    /// The SDK zips QJS assets internally (`makeZip`) then pushes with dial type **5**.
+    /// Custom packages use **byteAlign: true** inside the SDK path (unlike online packages).
+    /// Requires a non-nil `thumbnailImage`; background is optional.
+    ///
+    /// Acquires the exclusive `.watchface` transfer lock.
+    func pushCustomWatchface(_ watchface: SlifiCustomWatchface,
+                             onCompress: ((Bool) -> Void)? = nil,
+                             onProgress: @escaping (Float) -> Void,
+                             completion: @escaping (Result<Void, Error>) -> Void) {
+        if let err = beginTransfer(.watchface) { completion(.failure(err)); return }
+        guard let uuid = connectedUUID() else {
+            endTransfer()
+            completion(.failure(SdkError(code: -5, message: "no connected uuid")))
+            return
+        }
+        SifliWatchfaceSDK.getInstance().setCustomWatchface(
+            devIdentifier: uuid,
+            watchface: watchface,
+            compressSuccessCallback: { ok in
+                DispatchQueue.main.async { onCompress?(ok) }
+            },
+            progressCallback: { p in
+                DispatchQueue.main.async { onProgress(Float(p) / 100.0) }
+            },
+            finishCallback: { [weak self] ok, errInfo, errType, _ in
+                DispatchQueue.main.async {
+                    self?.endTransfer()
+                    if ok { completion(.success(())) }
+                    else {
+                        completion(.failure(SdkError(
+                            code: Int(errType),
+                            message: errInfo ?? "custom watchface fail"
+                        )))
+                    }
+                }
+            }
+        )
+    }
+
+    /// Online install pipeline used by the Online tab (aligned with HaWoFit `WatchfaceInstallVC`).
+    ///
+    /// # Steps
+    /// 1. `getSifliInstalledWatchfaceNames` — if any installed name is a substring of
+    ///    `item.name` (`catalog.name.contains(installedName)`), only call
+    ///    `switchSifliWatchface` (no re-download).
+    /// 2. Otherwise download `item.bin` into cache, verify `binMd5`, then
+    ///    `pushOnlineWatchfaceZip`.
+    /// 3. Query/switch failures fall back to download+push so the demo stays usable.
+    ///
+    /// # Progress mapping
+    /// Download ≈ 0...40, BLE push ≈ 40...100 (percent integers for the UI bar).
+    func installOnlineWatchface(_ item: OnlineWatchface,
+                                onPhase: @escaping (OnlineWatchfaceInstallPhase) -> Void,
+                                onProgress: @escaping (Int) -> Void,
+                                onLog: ((String) -> Void)? = nil,
+                                completion: @escaping (Result<Void, Error>) -> Void) {
+        guard isConnected() else {
+            completion(.failure(SdkError(code: 408, message: L10n.tr("status_need_connect"))))
+            return
+        }
+        guard let binPath = item.bin, !binPath.isEmpty else {
+            completion(.failure(SdkError(code: -1, message: L10n.tr("wf_err_no_bin"))))
+            return
+        }
+        onPhase(.checking)
+        getSifliInstalledWatchfaceNames { [weak self] result in
+            guard let self = self else { return }
+            let installed: [String]
+            switch result {
+            case .success(let names):
+                installed = names
+                onLog?("installed=\(names.joined(separator: ","))")
+            case .failure(let e):
+                onLog?("getSifliInstalledWatchfaceNames fail: \(e.localizedDescription); fallback download")
+                installed = []
+            }
+            // HaWoFit match: catalog display name contains the short installed name.
+            if let hit = installed.first(where: { name in
+                let n = name.trimmingCharacters(in: .whitespacesAndNewlines)
+                return !n.isEmpty && item.name.contains(n)
+            }) {
+                onPhase(.switching)
+                onLog?("already installed as \(hit); switching")
+                self.switchSifliWatchface(name: hit) { switchResult in
+                    switch switchResult {
+                    case .success:
+                        onPhase(.success)
+                        onProgress(100)
+                        completion(.success(()))
+                    case .failure(let e):
+                        onLog?("switch fail: \(e.localizedDescription); fallback download")
+                        self.downloadAndPushOnline(item: item, bin: binPath, onPhase: onPhase, onProgress: onProgress, onLog: onLog, completion: completion)
+                    }
+                }
+                return
+            }
+            self.downloadAndPushOnline(item: item, bin: binPath, onPhase: onPhase, onProgress: onProgress, onLog: onLog, completion: completion)
+        }
+    }
+
+    /// Downloads `bin` into cache (MD5 when provided), then calls `pushOnlineWatchfaceZip`.
+    /// Progress: download ≈ 0...40, BLE push ≈ 40...100.
+    private func downloadAndPushOnline(item: OnlineWatchface,
+                                       bin: String,
+                                       onPhase: @escaping (OnlineWatchfaceInstallPhase) -> Void,
+                                       onProgress: @escaping (Int) -> Void,
+                                       onLog: ((String) -> Void)?,
+                                       completion: @escaping (Result<Void, Error>) -> Void) {
+        onPhase(.downloading)
+        // Sync download API — keep off the main thread.
+        DispatchQueue.global(qos: .userInitiated).async {
+            do {
+                let fileName = (bin as NSString).lastPathComponent
+                let zip = try WatchfaceApi.downloadToCache(
+                    url: bin,
+                    fileName: fileName.isEmpty ? "\(item.id).zip" : fileName,
+                    expectMd5: item.binMd5,
+                    onProgress: { pct in
+                        DispatchQueue.main.async { onProgress(min(40, pct * 40 / 100)) }
+                    }
+                )
+                DispatchQueue.main.async {
+                    onLog?("downloaded \(zip.lastPathComponent)")
+                    onPhase(.installing)
+                    self.pushOnlineWatchfaceZip(zipURL: zip, onProgress: { p in
+                        onProgress(40 + Int(p * 60))
+                    }, completion: { result in
+                        switch result {
+                        case .success:
+                            onPhase(.success)
+                            onProgress(100)
+                        case .failure:
+                            onPhase(.failed)
+                        }
+                        completion(result)
+                    })
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    onPhase(.failed)
                     completion(.failure(error))
                 }
             }

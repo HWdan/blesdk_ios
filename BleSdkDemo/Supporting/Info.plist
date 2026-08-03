@@ -28,6 +28,8 @@
 	<string>需要蓝牙权限以扫描、连接并同步智能手表数据</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>用于 AGPS / 运动轨迹相关定位辅助</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Used for AI watchface voice input debugging</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>用于选择图片推送到手表相册</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
