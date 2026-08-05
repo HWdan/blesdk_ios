@@ -8,7 +8,8 @@
 #import "DefaultTextToVoiceHandler.h"
 #import "AiLogger.h"
 #import "AiSDK/AiSDK.h"
-#import <HwBluetoothSDK/HwBluetoothSDK.h>
+#import "HwBluetoothSDK.h"
+//#import <HwBluetoothSDK/HwBluetoothSDK.h>
 #import "AiFileUtils.h"
 #import <AVFoundation/AVFoundation.h>
 #import "VolumeManager.h"
