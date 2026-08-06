@@ -44,7 +44,7 @@ Pod::Spec.new do |s|
   s.subspec 'HwBluetoothSDK' do |hw|
     hw.preserve_paths = 'Vendor/HwBluetoothSDK/HwBluetoothSDK.framework', 'Vendor/HwBluetoothSDK/include', 'Vendor/HwBluetoothSDK/libHwBluetoothSDK.a'
     hw.vendored_libraries = 'Vendor/HwBluetoothSDK/libHwBluetoothSDK.a'
-    hw.module_map = 'Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Modules/module.modulemap'
+        hw.preserve_paths = 'Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Modules/module.modulemap'
     hw.frameworks = 'CoreBluetooth', 'Foundation', 'UIKit'
     hw.libraries = 'z', 'c++'
     
