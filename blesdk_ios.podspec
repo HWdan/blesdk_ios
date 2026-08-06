@@ -11,7 +11,7 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '14.0'
 
   # 只需依赖AiSDK，所有其他依赖会自动传递
-  s.dependency 'AiSDK'
+    s.dependency 'AiSDK', :path => 'Vendor/AiSDK'
 
   # 编译配置
   s.pod_target_xcconfig = {
