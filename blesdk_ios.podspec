@@ -10,10 +10,29 @@ Pod::Spec.new do |s|
   s.source           = { :git => 'https://github.com/HWdan/blesdk_ios.git', :tag => s.version.to_s }
   s.ios.deployment_target = '14.0'
 
-  # 只需依赖AiSDK，所有其他依赖会自动传递
-    s.dependency 'AiSDK', :path => 'Vendor/AiSDK'
+  # --- 定义一个名为 'AiSDK' 的子库 ---
+  s.subspec 'AiSDK' do |ai|
+    # 指向 Vendor 目录下的 AiSDK 源码
+    ai.source_files = 'Vendor/AiSDK/AiSDK/Classes/**/*'
+    ai.public_header_files = 'Vendor/AiSDK/AiSDK/Classes/**/*.h'
+    ai.resource_bundles = {
+      'AiSDK' => ['Vendor/AiSDK/AiSDK/Assets/*.png']
+    }
+    
+    # 保留 AiSDK 的所有原始依赖
+    ai.dependency 'AFNetworking', '~> 4.0.1'
+    ai.dependency 'HwBluetoothSDK'
+    ai.dependency 'WatchfaceSDK'
+    ai.dependency 'SSZipArchive'
+    
+    # 保留 AiSDK 的 vendored frameworks
+    ai.vendored_frameworks = 'Vendor/AiSDK/NativeLib.xcframework', 'Vendor/AiSDK/JLBmpConvertKit.xcframework'
+  end
 
-  # 编译配置
+  # --- 让主库默认包含 AiSDK 子库 ---
+  s.default_subspecs = ['AiSDK']
+
+  # 编译配置保持不变
   s.pod_target_xcconfig = {
     'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES',
     'ENABLE_BITCODE' => 'NO',
