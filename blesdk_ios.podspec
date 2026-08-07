@@ -10,7 +10,7 @@ Pod::Spec.new do |s|
   s.source           = { :git => 'https://github.com/HWdan/blesdk_ios.git', :tag => s.version.to_s }
   s.ios.deployment_target = '14.0'
 
-  # 1. Zip 子库（直接照搬你本地 Podfile 中 :path 指向的 Zip.podspec 配置）
+  # 1. Zip 子库
   s.subspec 'Zip' do |zip|
     zip.source_files = 'Vendor/Zip/Zip/*.{swift,h}', 'Vendor/Zip/Zip/minizip/*.{c,h}', 'Vendor/Zip/Zip/minizip/include/*.{h}'
     zip.public_header_files = 'Vendor/Zip/Zip/*.h'
@@ -22,7 +22,7 @@ Pod::Spec.new do |s|
     zip.preserve_paths = 'Vendor/Zip/Zip/minizip/module/module.modulemap', 'Vendor/Zip/Zip/minizip/include/*'
   end
 
-  # 2. SSZipArchive 子库（配置来自 SSZipArchive.podspec）
+  # 2. SSZipArchive 子库
   s.subspec 'SSZipArchive' do |ss|
     ss.source_files = 'Vendor/SSZipArchive/SSZipArchive/*.{m,h}', 'Vendor/SSZipArchive/SSZipArchive/include/*.{m,h}', 'Vendor/SSZipArchive/SSZipArchive/minizip/*.{c,h}'
     ss.public_header_files = 'Vendor/SSZipArchive/SSZipArchive/*.h'
@@ -34,7 +34,7 @@ Pod::Spec.new do |s|
     }
   end
 
-  # 3. HwBluetoothSDK 子库（配置来自 HwBluetoothSDK.podspec，已使用动态路径）
+  # 3. HwBluetoothSDK 子库 (静态库)
   s.subspec 'HwBluetoothSDK' do |hw|
     hw.preserve_paths = [
       'Vendor/HwBluetoothSDK/HwBluetoothSDK.framework',
@@ -66,7 +66,7 @@ Pod::Spec.new do |s|
     }
   end
 
-  # 4. WatchfaceSDK 子库（配置来自 WatchfaceSDK.podspec）
+  # 4. WatchfaceSDK 子库 (依赖 Zip 和 SSZipArchive)
   s.subspec 'WatchfaceSDK' do |wf|
     wf.source_files = [
       'Vendor/WatchfaceSDK/WatchfaceSDK/Classes/Watchface/**/*',
@@ -86,7 +86,7 @@ Pod::Spec.new do |s|
     wf.dependency 'blesdk_ios/SSZipArchive'
   end
 
-  # 5. AiSDK 子库（配置来自 AiSDK.podspec）
+  # 5. AiSDK 子库 (依赖 HwBluetoothSDK 和 WatchfaceSDK)
   s.subspec 'AiSDK' do |ai|
     ai.source_files = 'Vendor/AiSDK/AiSDK/Classes/**/*'
     ai.public_header_files = 'Vendor/AiSDK/AiSDK/Classes/**/*.h'
@@ -95,8 +95,8 @@ Pod::Spec.new do |s|
     }
     ai.vendored_frameworks = 'Vendor/AiSDK/NativeLib.xcframework', 'Vendor/AiSDK/JLBmpConvertKit.xcframework'
     
-    # 关键：AiSDK 依赖所有其他子库，是聚合点
-    ai.dependency 'AFNetworking', '~> 4.0.1' # 公开库
+    # 关键：AiSDK 依赖其他子库
+    ai.dependency 'AFNetworking', '~> 4.0.1'
     ai.dependency 'blesdk_ios/HwBluetoothSDK'
     ai.dependency 'blesdk_ios/WatchfaceSDK'
     # 由于 WatchfaceSDK 已经依赖了 Zip 和 SSZipArchive，这里不需要重复依赖
