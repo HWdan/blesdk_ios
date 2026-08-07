@@ -54,10 +54,9 @@ Pod::Spec.new do |s|
     ai.resource_bundles = {
       'AiSDK' => ['Vendor/AiSDK/AiSDK/Assets/*.png']
     }
-    ai.vendored_frameworks = 'Vendor/AiSDK/NativeLib.xcframework', 'Vendor/AiSDK/JLBmpConvertKit.xcframework'
+    ai.vendored_frameworks = 'Vendor/AiSDK/NativeLib.xcframework', 'Vendor/AiSDK/JLBmpConvertKit.xcframework', 'Vendor/HwBluetoothSDK/HwBluetoothSDK.framework'
     
     ai.dependency 'AFNetworking', '~> 4.0.1'
-    ai.dependency 'blesdk_ios/HwBluetoothSDK'
     ai.dependency 'WatchfaceSDK'
     
   end
