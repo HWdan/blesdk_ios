@@ -14,7 +14,6 @@ Pod::Spec.new do |s|
   # 1. HwBluetoothSDK 子库
   # ============================================================
   s.subspec 'HwBluetoothSDK' do |hw|
-    # 【修复】合并 preserve_paths，避免覆盖
     hw.preserve_paths = [
       'Vendor/HwBluetoothSDK/HwBluetoothSDK.framework',
       'Vendor/HwBluetoothSDK/include',
@@ -25,7 +24,6 @@ Pod::Spec.new do |s|
     hw.frameworks = 'CoreBluetooth', 'Foundation', 'UIKit'
     hw.libraries = 'z', 'c++'
     
-    # 建议将路径改为 PODS_TARGET_SRCROOT，更可靠
     root = '${PODS_TARGET_SRCROOT}/Vendor/HwBluetoothSDK'
     header_paths = [
       "\"#{root}/include\"",
@@ -48,7 +46,7 @@ Pod::Spec.new do |s|
   end
 
   # ============================================================
-  # 2. WatchfaceSDK 子库（依赖从官方源获取）
+  # 2. WatchfaceSDK 子库
   # ============================================================
   s.subspec 'WatchfaceSDK' do |wf|
     wf.source_files = [
@@ -64,14 +62,12 @@ Pod::Spec.new do |s|
     ]
     wf.frameworks = 'AudioToolbox', 'CoreMedia', 'VideoToolbox', 'AVFoundation'
     wf.libraries = 'bz2', 'z', 'c++'
-    
-    # 从官方源获取
     wf.dependency 'Zip'
     wf.dependency 'SSZipArchive'
   end
 
   # ============================================================
-  # 3. AiSDK 子库
+  # 3. AiSDK 子库（已修改）
   # ============================================================
   s.subspec 'AiSDK' do |ai|
     ai.source_files = 'Vendor/AiSDK/AiSDK/Classes/**/*'
@@ -84,6 +80,14 @@ Pod::Spec.new do |s|
     ai.dependency 'AFNetworking', '~> 4.0.1'
     ai.dependency 'blesdk_ios/HwBluetoothSDK'
     ai.dependency 'blesdk_ios/WatchfaceSDK'
+    
+    # ========== 新增配置开始 ==========
+    # 为 AiSDK 添加头文件搜索路径，指向 WatchfaceSDK 生成的头文件目录
+    ai.pod_target_xcconfig = {
+      'HEADER_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}/Headers/Public/WatchfaceSDK"',
+      'SWIFT_OBJC_INTERFACE_HEADER_NAME' => 'WatchfaceSDK-Swift.h'
+    }
+    # ========== 新增配置结束 ==========
   end
 
   # ============================================================
