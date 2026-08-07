@@ -10,14 +10,38 @@ Pod::Spec.new do |s|
   s.source           = { :git => 'https://github.com/HWdan/blesdk_ios.git', :tag => s.version.to_s }
   s.ios.deployment_target = '14.0'
 
-  # 1. 定义 HwBluetoothSDK 子库 (作为静态库)
+  # 1. Zip 子库（直接照搬你本地 Podfile 中 :path 指向的 Zip.podspec 配置）
+  s.subspec 'Zip' do |zip|
+    zip.source_files = 'Vendor/Zip/Zip/*.{swift,h}', 'Vendor/Zip/Zip/minizip/*.{c,h}', 'Vendor/Zip/Zip/minizip/include/*.{h}'
+    zip.public_header_files = 'Vendor/Zip/Zip/*.h'
+    zip.libraries = 'z'
+    zip.pod_target_xcconfig = {
+      'SWIFT_INCLUDE_PATHS' => '$(SRCROOT)/Vendor/Zip/Zip/minizip/** $(PODS_TARGET_SRCROOT)/Vendor/Zip/Zip/minizip/**',
+      'LIBRARY_SEARCH_PATHS' => '$(inherited) $(PODS_TARGET_SRCROOT)/Vendor/Zip/Zip/'
+    }
+    zip.preserve_paths = 'Vendor/Zip/Zip/minizip/module/module.modulemap', 'Vendor/Zip/Zip/minizip/include/*'
+  end
+
+  # 2. SSZipArchive 子库（配置来自 SSZipArchive.podspec）
+  s.subspec 'SSZipArchive' do |ss|
+    ss.source_files = 'Vendor/SSZipArchive/SSZipArchive/*.{m,h}', 'Vendor/SSZipArchive/SSZipArchive/include/*.{m,h}', 'Vendor/SSZipArchive/SSZipArchive/minizip/*.{c,h}'
+    ss.public_header_files = 'Vendor/SSZipArchive/SSZipArchive/*.h'
+    ss.libraries = 'z', 'iconv'
+    ss.frameworks = 'Security'
+    ss.pod_target_xcconfig = {
+      'DEFINES_MODULE' => 'YES',
+      'GCC_PREPROCESSOR_DEFINITIONS' => '$(inherited) HAVE_INTTYPES_H HAVE_PKCRYPT HAVE_STDINT_H HAVE_WZAES HAVE_ZLIB'
+    }
+  end
+
+  # 3. HwBluetoothSDK 子库（配置来自 HwBluetoothSDK.podspec，已使用动态路径）
   s.subspec 'HwBluetoothSDK' do |hw|
-    hw.vendored_libraries = 'Vendor/HwBluetoothSDK/libHwBluetoothSDK.a'
     hw.preserve_paths = [
       'Vendor/HwBluetoothSDK/HwBluetoothSDK.framework',
       'Vendor/HwBluetoothSDK/include',
       'Vendor/HwBluetoothSDK/libHwBluetoothSDK.a'
     ]
+    hw.vendored_libraries = 'Vendor/HwBluetoothSDK/libHwBluetoothSDK.a'
     hw.frameworks = 'CoreBluetooth', 'Foundation', 'UIKit'
     hw.libraries = 'z', 'c++'
     
@@ -35,11 +59,19 @@ Pod::Spec.new do |s|
       'DEFINES_MODULE' => 'YES',
       'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES'
     }
+    hw.user_target_xcconfig = {
+      'HEADER_SEARCH_PATHS' => header_paths,
+      'FRAMEWORK_SEARCH_PATHS' => "\"#{root}\"",
+      'LIBRARY_SEARCH_PATHS' => "\"#{root}\""
+    }
   end
 
-  # 2. 定义 WatchfaceSDK 子库 (包含其源码和所有预编译 framework)
+  # 4. WatchfaceSDK 子库（配置来自 WatchfaceSDK.podspec）
   s.subspec 'WatchfaceSDK' do |wf|
-    wf.source_files = 'Vendor/WatchfaceSDK/WatchfaceSDK/Classes/**/*'
+    wf.source_files = [
+      'Vendor/WatchfaceSDK/WatchfaceSDK/Classes/Watchface/**/*',
+      'Vendor/WatchfaceSDK/WatchfaceSDK/Classes/OTA/**/*'
+    ]
     wf.resources = ['Vendor/WatchfaceSDK/WatchfaceSDK/Assets/*']
     wf.vendored_frameworks = [
       'Vendor/WatchfaceSDK/WatchfaceSDK/SFDialPlateSDK.framework',
@@ -49,25 +81,31 @@ Pod::Spec.new do |s|
     ]
     wf.frameworks = 'AudioToolbox', 'CoreMedia', 'VideoToolbox', 'AVFoundation'
     wf.libraries = 'bz2', 'z', 'c++'
-    # 移除所有 dependency，因为预编译库已直接引用
+    # 关键：WatchfaceSDK 依赖 Zip 和 SSZipArchive 子库
+    wf.dependency 'blesdk_ios/Zip'
+    wf.dependency 'blesdk_ios/SSZipArchive'
   end
 
-  # 3. 定义 AiSDK 子库 (作为主入口)
+  # 5. AiSDK 子库（配置来自 AiSDK.podspec）
   s.subspec 'AiSDK' do |ai|
     ai.source_files = 'Vendor/AiSDK/AiSDK/Classes/**/*'
     ai.public_header_files = 'Vendor/AiSDK/AiSDK/Classes/**/*.h'
-    ai.resource_bundles = { 'AiSDK' => ['Vendor/AiSDK/AiSDK/Assets/*.png'] }
+    ai.resource_bundles = {
+      'AiSDK' => ['Vendor/AiSDK/AiSDK/Assets/*.png']
+    }
     ai.vendored_frameworks = 'Vendor/AiSDK/NativeLib.xcframework', 'Vendor/AiSDK/JLBmpConvertKit.xcframework'
     
-    ai.dependency 'AFNetworking', '~> 4.0.1'          # 公开库
-    ai.dependency 'blesdk_ios/HwBluetoothSDK'         # 内部子库
-    ai.dependency 'blesdk_ios/WatchfaceSDK'           # 内部子库
-    # 移除对 Zip 和 SSZipArchive 的依赖
+    # 关键：AiSDK 依赖所有其他子库，是聚合点
+    ai.dependency 'AFNetworking', '~> 4.0.1' # 公开库
+    ai.dependency 'blesdk_ios/HwBluetoothSDK'
+    ai.dependency 'blesdk_ios/WatchfaceSDK'
+    # 由于 WatchfaceSDK 已经依赖了 Zip 和 SSZipArchive，这里不需要重复依赖
   end
 
-  # 默认包含 AiSDK
+  # 6. 设置默认子库为 AiSDK
   s.default_subspecs = ['AiSDK']
 
+  # 7. 全局编译配置
   s.pod_target_xcconfig = {
     'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES',
     'ENABLE_BITCODE' => 'NO',
