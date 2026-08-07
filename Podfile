@@ -7,13 +7,11 @@ inhibit_all_warnings!
 target 'BleSdkDemo' do
   project 'BleSdkDemo'
 
-  pod 'HwBluetoothSDK', :path => 'Vendor/HwBluetoothSDK'
-  pod 'Zip', :path => 'Vendor/Zip'
-  pod 'SSZipArchive', :path => 'Vendor/SSZipArchive'
-  pod 'WatchfaceSDK', :path => 'Vendor/WatchfaceSDK'
-  # Local AiSDK with Esafenet headers replaced by reconstructed plaintext under Vendor/AiSDK.
-  pod 'AiSDK', :path => 'Vendor/AiSDK'
+  pod 'blesdk_ios', :git => 'https://github.com/HWdan/blesdk_ios.git', :branch => 'main'
+  pod 'WatchfaceSDK', :git => 'https://github.com/HWdan/WatchfaceSDK.git', :branch => 'main'
   pod 'AFNetworking', '~> 4.0.1'
+  pod 'SSZipArchive'
+  pod 'Zip', '~> 2.1'
 end
 
 post_install do |installer|
