@@ -46,27 +46,6 @@ Pod::Spec.new do |s|
   end
 
   # ============================================================
-  # 2. WatchfaceSDK 子库
-  # ============================================================
-  s.subspec 'WatchfaceSDK' do |wf|
-    wf.source_files = [
-      'Vendor/WatchfaceSDK/WatchfaceSDK/Classes/Watchface/**/*',
-      'Vendor/WatchfaceSDK/WatchfaceSDK/Classes/OTA/**/*'
-    ]
-    wf.resources = ['Vendor/WatchfaceSDK/WatchfaceSDK/Assets/*']
-    wf.vendored_frameworks = [
-      'Vendor/WatchfaceSDK/WatchfaceSDK/SFDialPlateSDK.framework',
-      'Vendor/WatchfaceSDK/WatchfaceSDK/eZIPSDK.framework',
-      'Vendor/WatchfaceSDK/WatchfaceSDK/SifliOTAManagerSDK.framework',
-      'Vendor/WatchfaceSDK/WatchfaceSDK/VideoWatchfaceSDK.framework'
-    ]
-    wf.frameworks = 'AudioToolbox', 'CoreMedia', 'VideoToolbox', 'AVFoundation'
-    wf.libraries = 'bz2', 'z', 'c++'
-    wf.dependency 'Zip'
-    wf.dependency 'SSZipArchive'
-  end
-
-  # ============================================================
   # 3. AiSDK 子库（已修改）
   # ============================================================
   s.subspec 'AiSDK' do |ai|
@@ -79,15 +58,8 @@ Pod::Spec.new do |s|
     
     ai.dependency 'AFNetworking', '~> 4.0.1'
     ai.dependency 'blesdk_ios/HwBluetoothSDK'
-    ai.dependency 'blesdk_ios/WatchfaceSDK'
+    ai.dependency 'WatchfaceSDK'
     
-    # ========== 新增配置开始 ==========
-    # 为 AiSDK 添加头文件搜索路径，指向 WatchfaceSDK 生成的头文件目录
-    ai.pod_target_xcconfig = {
-      'HEADER_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}/Headers/Public/WatchfaceSDK"',
-      'SWIFT_OBJC_INTERFACE_HEADER_NAME' => 'WatchfaceSDK-Swift.h'
-    }
-    # ========== 新增配置结束 ==========
   end
 
   # ============================================================
