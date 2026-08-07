@@ -14,14 +14,6 @@ Pod::Spec.new do |s|
   # 主库源码（包含所有模块的源码）
   # ============================================================
   s.source_files = [
-    # Zip 源码
-    'Vendor/Zip/Zip/*.{swift,h}',
-    'Vendor/Zip/Zip/minizip/*.{c,h}',
-    'Vendor/Zip/Zip/minizip/include/*.{h}',
-    # SSZipArchive 源码
-    'Vendor/SSZipArchive/SSZipArchive/*.{m,h}',
-    'Vendor/SSZipArchive/SSZipArchive/include/*.{m,h}',
-    'Vendor/SSZipArchive/SSZipArchive/minizip/*.{c,h}',
     # WatchfaceSDK 源码
     'Vendor/WatchfaceSDK/WatchfaceSDK/Classes/Watchface/**/*',
     'Vendor/WatchfaceSDK/WatchfaceSDK/Classes/OTA/**/*',
@@ -33,8 +25,6 @@ Pod::Spec.new do |s|
   # 公开头文件
   # ============================================================
   s.public_header_files = [
-    'Vendor/Zip/Zip/*.h',
-    'Vendor/SSZipArchive/SSZipArchive/*.h',
     'Vendor/AiSDK/AiSDK/Classes/**/*.h'
   ]
 
@@ -77,7 +67,9 @@ Pod::Spec.new do |s|
   # 外部依赖（公开 CocoaPods 库）
   # ============================================================
   s.dependency 'AFNetworking', '~> 4.0.1'
-
+  s.dependency 'SSZipArchive'
+  s.dependency 'Zip'
+  
   # ============================================================
   # 编译配置
   # ============================================================
@@ -85,7 +77,6 @@ Pod::Spec.new do |s|
     'HEADER_SEARCH_PATHS' => '$(inherited) "${PODS_TARGET_SRCROOT}/Vendor/HwBluetoothSDK/include" "${PODS_TARGET_SRCROOT}/Vendor/HwBluetoothSDK/include/HwBluetoothSDK" "${PODS_TARGET_SRCROOT}/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers"',
     'FRAMEWORK_SEARCH_PATHS' => '$(inherited) "${PODS_TARGET_SRCROOT}/Vendor/HwBluetoothSDK"',
     'LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_TARGET_SRCROOT}/Vendor/HwBluetoothSDK"',
-    'SWIFT_INCLUDE_PATHS' => '$(SRCROOT)/Vendor/Zip/Zip/minizip/** $(PODS_TARGET_SRCROOT)/Vendor/Zip/Zip/minizip/**',
     'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES',
     'ENABLE_BITCODE' => 'NO',
     'DEFINES_MODULE' => 'YES',
@@ -101,8 +92,6 @@ Pod::Spec.new do |s|
     'Vendor/HwBluetoothSDK/include',
     'Vendor/HwBluetoothSDK/libHwBluetoothSDK.a',
     'Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Modules/module.modulemap',
-    'Vendor/Zip/Zip/minizip/module/module.modulemap',
-    'Vendor/Zip/Zip/minizip/include/*'
   ]
 
   s.static_framework = true
