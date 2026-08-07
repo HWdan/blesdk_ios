@@ -7,7 +7,7 @@
 
 #import "DefaultTextToAnswerTextHandler.h"
 #import "AiLogger.h"
-#import "AiSDK/AiSDK.h"
+#import "AiSDK.h"
 //#import <NativeLib/NativeLib.h>
 //#import <NativeLib/NativeLib-Swift.h>
 @import NativeLib;

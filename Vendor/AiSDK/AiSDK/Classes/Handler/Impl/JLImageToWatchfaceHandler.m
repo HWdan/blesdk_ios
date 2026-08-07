@@ -11,9 +11,9 @@
 #import "AiSDK.h"
 #import "AiLogger.h"
 #import "AiFileUtils.h"
-#import "HwBluetoothSDK.h"
+#import "HwBluetoothSDK/HwBluetoothSDK.h"
 #import "JLBmpConvertKit/JLBmpConvertKit.h"
-#import "HwBluetoothCenter+MultipleFileTransfer.h"
+#import "HwBluetoothSDK/HwBluetoothCenter+MultipleFileTransfer.h"
 #import "WatchfaceSDK/WatchfaceSDK-Swift.h"
 
 @interface JLImageToWatchfaceHandler()

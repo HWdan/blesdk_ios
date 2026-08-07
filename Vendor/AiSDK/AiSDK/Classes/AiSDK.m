@@ -6,8 +6,7 @@
 //
 
 #import "AiSDK.h"
-#import "HwBluetoothSDK.h"
-//#import "HwBluetoothSDK/HwBluetoothSDK.h"
+#import "HwBluetoothSDK/HwBluetoothSDK.h"
 #import "WatchfaceSDK/WatchfaceSDK-Swift.h"
 //#import <NativeLib/NativeLib.h>
 //#import <NativeLib/NativeLib-Swift.h>

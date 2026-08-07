@@ -6,8 +6,7 @@
 #import "AiSifliDevicePlatformStrategy.h"
 #import "AiSDK.h"
 #import "DefaultImageToWatchfaceHandler.h"
-#import "HwBluetoothSDK.h"
-//#import "HwBluetoothSDK/HwBluetoothSDK.h"
+#import "HwBluetoothSDK/HwBluetoothSDK.h"
 
 @implementation AiSifliDevicePlatformStrategy
 

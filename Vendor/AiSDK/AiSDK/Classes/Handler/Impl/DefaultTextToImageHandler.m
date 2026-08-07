@@ -7,7 +7,7 @@
 
 #import "DefaultTextToImageHandler.h"
 #import "AiLogger.h"
-#import "AiSDK/AiSDK.h"
+#import "AiSDK.h"
 
 @implementation DefaultTextToImageHandler
 

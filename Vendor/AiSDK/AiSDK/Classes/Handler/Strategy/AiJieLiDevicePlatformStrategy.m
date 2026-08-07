@@ -6,8 +6,7 @@
 #import "AiJieLiDevicePlatformStrategy.h"
 #import "AiSDK.h"
 #import "JLImageToWatchfaceHandler.h"
-#import "HwBluetoothSDK.h"
-//#import "HwBluetoothSDK/HwBluetoothSDK.h"
+#import "HwBluetoothSDK/HwBluetoothSDK.h"
 
 @implementation AiJieLiDevicePlatformStrategy
 

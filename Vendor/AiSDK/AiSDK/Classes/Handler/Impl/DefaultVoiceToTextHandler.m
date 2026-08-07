@@ -7,7 +7,7 @@
 
 #import "DefaultVoiceToTextHandler.h"
 #import "AiLogger.h"
-#import "AiSDK/AiSDK.h"
+#import "AiSDK.h"
 
 @implementation DefaultVoiceToTextHandler
 

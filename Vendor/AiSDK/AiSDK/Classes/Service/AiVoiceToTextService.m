@@ -8,9 +8,8 @@
 #import "AiVoiceToTextService.h"
 #import "AiLogger.h"
 #import "AiLocaleUtils.h"
-#import "AiSDK/AiSDK.h"
-#import "HwBluetoothSDK.h"
-//#import "HwBluetoothSDK/HwBluetoothSDK.h"
+#import "AiSDK.h"
+#import "HwBluetoothSDK/HwBluetoothSDK.h"
 //#import <NativeLib/NativeLib.h>
 //#import <NativeLib/NativeLib-Swift.h>
 @import NativeLib;

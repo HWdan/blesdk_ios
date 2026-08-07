@@ -7,11 +7,10 @@
 
 #import "DefaultTextToTranslateResultHandler.h"
 #import "AiLogger.h"
-#import "AiSDK/AiSDK.h"
-#import "HwBluetoothSDK.h"
-//#import <HwBluetoothSDK/HwBluetoothSDK.h>
+#import "AiSDK.h"
+#import "HwBluetoothSDK/HwBluetoothSDK.h"
 #import "AiLocaleUtils.h"
-#import "NSData+HwBLE.h"
+#import "HwBluetoothSDK/NSData+HwBLE.h"
 #import "AiFileUtils.h"
 //#import <NativeLib/NativeLib.h>
 //#import <NativeLib/NativeLib-Swift.h>
